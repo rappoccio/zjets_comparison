@@ -1,10 +1,9 @@
-# HTCondor submit description. Static settings only — submit.sh appends
-# `arguments`, `+JobFlavour` and `queue` from config.sh, so don't edit this.
+# HTCondor submit description. Static settings only — the submit scripts append
+# `executable`, `arguments`, `+JobFlavour` and `queue`, so don't edit this.
 universe                = vanilla
-executable              = gen_job.sh
 
-output                  = log/gen.$(Process).out
-error                   = log/gen.$(Process).err
+output                  = log/gen.$(Cluster).$(Process).out
+error                   = log/gen.$(Cluster).$(Process).err
 log                     = log/gen.condor.log
 
 request_cpus            = 1

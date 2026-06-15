@@ -1,0 +1,34 @@
+# aMC@NLO Z+jet card for BATCH use: @SEED@ and @NEV@ are substituted per job by
+# gen_amcnlo_job.sh so each job is an independent, distinct-seed sample that is
+# summed with the others at plot time. Output dir is fixed (each job runs in its
+# own scratch, so no collision).
+import model sm
+define j = g u c d s b u~ c~ d~ s~ b~
+generate p p > z j [QCD]
+output zjets_nlo -f
+
+launch zjets_nlo
+shower=Pythia8
+madspin=ON
+reweight=OFF
+# --- run_card (NLO) ---
+set ebeam1     6500
+set ebeam2     6500
+set pdlabel    lhapdf
+set lhaid      325300        # NNPDF31_nnlo_as_0118
+set ptj        150           # recoil-jet generation cut
+set ptl        15
+set mll        50
+set nevents    @NEV@
+set iseed      @SEED@        # distinct random seed per job
+set use_syst   False
+# --- MadSpin: Z -> charged leptons (e/mu) ---
+set spinmode   none
+decay z > l+ l-
+# --- pythia8_card: CP5 tune + HepMC output ---
+set HEPMCoutput:file       auto
+set Tune:pp                14
+set MultipartonInteractions:ecmPow    0.03344
+set MultipartonInteractions:bProfile  2
+set MultipartonInteractions:pT0Ref    1.41
+set ColourReconnection:range          5.176

@@ -8,30 +8,46 @@ on lxplus via a CVMFS LCG view** + **HTCondor** — no Docker, no container.
 Copy this whole directory to **EOS** (not AFS home), then:
 
 ```bash
-vi config.sh        # set LCG_VIEW (Rivet >= 4.0), NEV, NSEEDS
-./prepare.sh        # ONCE: build the plugin + driver under the LCG view
-./submit.sh         # queue NSEEDS parallel jobs   (total = NEV*NSEEDS events)
-condor_q            #   ...watch them finish...
-./merge_plot.sh     # sum the seeds + make plots  ->  html/index.html
+vi config.sh          # set LCG_VIEW (Rivet >= 4.0); tune NEV/NSEEDS if you like
+./prepare.sh          # ONCE: build the plugin + driver under the LCG view
+
+./submit_pythia8.sh   # one batch per generator (each independent)
+./submit_vincia.sh
+./submit_amcnlo.sh
+condor_q              #   ...watch them finish...
+
+./merge_plot.sh       # auto-discovers yodas/* and plots them all -> html/index.html
 ```
 
-Quick end-to-end check before a big run: `NEV=20000 NSEEDS=4` in `config.sh`.
+There is **one submit script per generator** — run any subset, in any order, even
+concurrently (each uses its own AFS submit dir and its own `yodas/<tag>/`). You do
+NOT edit `config.sh` to switch generators.
+
+Quick end-to-end check before a big run: set `NSEEDS=4` (and `NSEEDS_MG=2`) in
+`config.sh`, run one submit script, then `merge_plot.sh`.
 
 ## Contents
 
 ```
-config.sh                     <- the ONLY file you edit (paths, stats, LCG view)
-prepare.sh                    one-time build of the plugin + pythia8-rivet
-submit.sh / gen.sub / gen_job.sh   HTCondor: one seed per job, YODA -> yodas/<tag>/
-merge_plot.sh                 sum seeds -> build_comparison.py -> rivet-mkhtml
-build_comparison.py           slices each 2D prediction to per-slice unit-area 1D,
-                              builds the /REF data from the npz
-CMS_2026_PAS_SMP_25_010.cc    the Rivet analysis (2D, HepData binning)
-hepdata_export_groomed.npz    the data (Z+jets, groomed)
-hepdata_export_ungroomed.npz  the data (Z+jets, ungroomed)
-pythia/                       main_rivet.cc, Makefile, cp5.cmnd, zjets.cmnd
-madgraph/                     zjets.mg5 + gen_madgraph.sh  (optional aMC@NLO)
-lhapdf-cache/                 CP5 PDF (NNPDF31_nnlo_as_0118), used if CVMFS lacks it
+config.sh             SHARED settings only (LCG view, NEV/NSEEDS, paths) — edit this
+prepare.sh            one-time build of the plugin + pythia8-rivet driver
+
+submit_pythia8.sh     ┐ per-generator submit scripts (thin wrappers)
+submit_vincia.sh      │   showers: _submit_shower.sh + gen_job.sh  -> yodas/{pythia8,vincia}/
+submit_amcnlo.sh      ┘   aMC@NLO: gen_amcnlo_job.sh               -> yodas/amcnlo/
+submit_lib.sh         shared condor_launch() used by all submit scripts
+gen.sub               static HTCondor description (executable/args/queue appended)
+gen_job.sh            shower payload (one seed)
+gen_amcnlo_job.sh     aMC@NLO payload (one seed)
+
+merge_plot.sh         sum every yodas/<gen>/ -> build_comparison.py -> rivet-mkhtml
+build_comparison.py   slice each 2D prediction to per-slice unit-area 1D + /REF from npz
+
+CMS_2026_PAS_SMP_25_010.cc      the Rivet analysis (2D, HepData binning)
+hepdata_export_{groomed,ungroomed}.npz   the data
+pythia/    main_rivet.cc, Makefile, cp5.cmnd, zjets.cmnd
+madgraph/  zjets.mg5 (reference), zjets_batch.mg5 (@SEED@/@NEV@ template)
+lhapdf-cache/   CP5 PDF (NNPDF31_nnlo_as_0118), used if CVMFS lacks it
 ```
 
 ## Pick an LCG view (Rivet >= 4.0 required)
@@ -53,23 +69,27 @@ can confirm). Match the platform tag to the node (`x86_64-el9-gcc13-opt` on lxpl
 generator overlaid and an MC/Data ratio pad. Each curve is unit-area-normalized
 within its pT slice.
 
-## More generators
+## Generators
 
-- **VINCIA**: set `TAG=vincia MODEL=2` (and a distinct `OUTDIR`) in `config.sh`,
-  re-run `./submit.sh`, then `./merge_plot.sh VINCIA=yodas/vincia`.
-- **aMC@NLO** (optional, needs an LCG view with MadGraph): `./madgraph/gen_madgraph.sh`,
-  then `./merge_plot.sh aMCNLO=yodas/amcnlo`.
+| script               | generator                      | jobs        | output dir      |
+|----------------------|--------------------------------|-------------|-----------------|
+| `submit_pythia8.sh`  | PYTHIA8 simple shower          | `NSEEDS`    | `yodas/pythia8` |
+| `submit_vincia.sh`   | PYTHIA8 + VINCIA shower         | `NSEEDS`    | `yodas/vincia`  |
+| `submit_amcnlo.sh`   | aMC@NLO `p p > z j [QCD]` + PY8 | `NSEEDS_MG` | `yodas/amcnlo`  |
+
+Each is independent. `merge_plot.sh` overlays whichever ones have produced YODAs —
+no need to run all three. (aMC@NLO needs an LCG view that also provides MadGraph.)
 
 ## Notes
 
 - Keep the package on **EOS** so HTCondor workers can read inputs. `prepare.sh`
   builds against CVMFS, which the workers also mount.
 - **lxplus batch + EOS:** the standard schedds forbid `/eos` paths *in the submit
-  file*, so `submit.sh` automatically stages Condor's control files (executable +
-  logs) to **`$SUBMIT_DIR`** on AFS (default `~/zjets_submit`), and each job copies
-  its YODA back to `OUTDIR` on EOS with `xrdcp`. You don't have to do anything —
-  just keep a little AFS quota free. (Alternative: the EosSubmit schedds let you
-  keep everything on EOS — https://batchdocs.web.cern.ch/local/eossubmit.html.)
+  file*, so each submit script stages Condor's control files (executable + logs) to
+  **`$SUBMIT_ROOT/<gen>`** on AFS (default `~/zjets_submit/<gen>`), and each job
+  copies its YODA back to EOS with `xrdcp` (normalizing `/eos/home-*` →
+  `/eos/user/*`). Just keep a little AFS quota free. (Alternative: the EosSubmit
+  schedds keep everything on EOS — https://batchdocs.web.cern.ch/local/eossubmit.html.)
 - Seeds are **summed** (raw counts) by `build_comparison.py`, so N jobs = N× stats.
   The `pT>400` slice needs the most events.
 - The CP5 PDF is bundled; generation is otherwise offline. `gen.sub` renews the
