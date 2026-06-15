@@ -18,4 +18,17 @@ rivet-build RivetCMS_2026_PAS_SMP_25_010.so CMS_2026_PAS_SMP_25_010.cc \
 echo ">>> building pythia8-rivet driver"
 cd "$PKG/pythia" && make
 
-echo ">>> OK: RivetCMS_2026_PAS_SMP_25_010.so and pythia/pythia8-rivet are ready"
+# aMC@NLO's NLO shower step calls `bc`, which batch worker nodes often lack (and
+# you can't apt-get there). Stash a copy from this login node so the jobs find it
+# on PATH. Its only runtime deps are base libs (libc, libtinfo) present on workers.
+echo ">>> bundling bc for aMC@NLO showering"
+mkdir -p "$PKG/madgraph/bin"
+if command -v bc >/dev/null; then
+  cp -f "$(command -v bc)" "$PKG/madgraph/bin/bc"
+  echo "    bundled $(command -v bc) -> madgraph/bin/bc"
+  echo "    deps: $(ldd "$(command -v bc)" 2>/dev/null | awk '{print $1}' | tr '\n' ' ')"
+else
+  echo "    WARN: bc not found on this node — aMC@NLO showering will be skipped on workers" >&2
+fi
+
+echo ">>> OK: plugin + pythia8-rivet (+ bundled bc) are ready"

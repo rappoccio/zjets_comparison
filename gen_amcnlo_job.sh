@@ -13,6 +13,12 @@ lhapdf ls --installed 2>/dev/null | grep -q NNPDF31_nnlo_as_0118 \
   || export LHAPDF_DATA_PATH="$PKG/lhapdf-cache:${LHAPDF_DATA_PATH:-}"
 command -v mg5_aMC >/dev/null || { echo "mg5_aMC not in this LCG view; pick one with MadGraph" >&2; exit 1; }
 
+# aMC@NLO's NLO shower step needs `bc`; workers often lack it (-> it silently
+# skips the shower and writes unphysical, unshowered LHE). Use the copy bundled by
+# prepare.sh.
+export PATH="$PKG/madgraph/bin:$PATH"
+command -v bc >/dev/null || echo "WARNING: bc not found even after bundling — shower will be skipped; re-run prepare.sh on a node that has bc" >&2
+
 SCRATCH="${_CONDOR_SCRATCH_DIR:-${TMPDIR:-/tmp}}/mg_${SEED}"
 mkdir -p "$SCRATCH" && cd "$SCRATCH"
 
