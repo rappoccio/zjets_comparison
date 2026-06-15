@@ -27,9 +27,13 @@ echo ">>> generating $NEV events (seed $SEED, model $MODEL)"
 
 DEST="${TAG}_zjets_seed${SEED}.yoda"
 if [ -n "$EOS_XROOTD" ]; then
-  # Write to EOS over xrootd (avoids deprecated /eos fuse writes from workers).
-  echo ">>> xrdcp -> ${EOS_XROOTD}${OUTDIR}/${DEST}"
-  xrdcp -f "$OUT" "${EOS_XROOTD}${OUTDIR}/${DEST}"
+  # The eosuser redirector serves the canonical /eos/user/<l>/<user> namespace;
+  # the physical /eos/home-<l>/<user> form is rejected ("public access level
+  # restriction"), so normalize it before building the xrootd URL.
+  EOSDEST=$(printf '%s' "$OUTDIR" | sed -E 's#^/eos/home-([^/]+)/#/eos/user/\1/#')
+  echo ">>> xrdcp -> ${EOS_XROOTD}${EOSDEST}/${DEST}"
+  xrdcp -f "$OUT" "${EOS_XROOTD}${EOSDEST}/${DEST}" \
+    || { echo "xrdcp failed; falling back to fuse copy" >&2; mkdir -p "$OUTDIR"; cp -f "$OUT" "$OUTDIR/${DEST}"; }
 else
   mkdir -p "$OUTDIR"; cp -f "$OUT" "$OUTDIR/${DEST}"
   echo ">>> wrote $OUTDIR/${DEST}"
