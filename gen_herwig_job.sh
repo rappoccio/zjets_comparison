@@ -14,6 +14,16 @@ SCRATCH="${_CONDOR_SCRATCH_DIR:-${TMPDIR:-/tmp}}/hw_${SEED}"
 mkdir -p "$SCRATCH" && cd "$SCRATCH"
 cp "$PKG/herwig/zjets.in" .
 
+# Herwig's `read snippets/...` needs its share/Herwig dir on the read search path.
+# Under a relocated LCG install the compiled-in path is wrong, so locate the real
+# share dir and symlink the snippets/defaults into cwd (works regardless of the
+# Herwig version's `read` flag syntax).
+HWSHARE=$(readlink -f "$(dirname "$(command -v Herwig)")/../share/Herwig" 2>/dev/null || true)
+[ -d "$HWSHARE/snippets" ] || { echo "cannot locate Herwig share dir (tried '$HWSHARE'); ls \$(dirname \$(command -v Herwig))/../share" >&2; exit 1; }
+ln -sf "$HWSHARE/snippets" snippets
+[ -d "$HWSHARE/defaults" ] && ln -sf "$HWSHARE/defaults" defaults
+echo ">>> using Herwig share: $HWSHARE"
+
 echo ">>> Herwig read"
 Herwig read zjets.in
 echo ">>> Herwig run ($NEV events, seed $SEED)"
