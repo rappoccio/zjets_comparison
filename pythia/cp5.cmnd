@@ -1,0 +1,24 @@
+! CMS CP5 underlying-event tune for PYTHIA 8.3 (simple shower).
+! Phys. Rev. D 103 (2021) (CMS-GEN-17-001). Requires LHAPDF6 NNPDF31_nnlo_as_0118.
+! Included from qcd.cmnd / zjets.cmnd. NOTE: these ISR/FSR settings are for the
+! *simple* shower only — do not apply them to VINCIA or DIRE (see those dirs).
+
+Tune:pp = 14
+Tune:ee = 7
+PDF:pSet = LHAPDF6:NNPDF31_nnlo_as_0118
+
+MultipartonInteractions:ecmPow   = 0.03344
+MultipartonInteractions:bProfile = 2
+MultipartonInteractions:pT0Ref   = 1.41
+MultipartonInteractions:coreRadius   = 0.7634
+MultipartonInteractions:coreFraction = 0.63
+ColourReconnection:range = 5.176
+SigmaTotal:zeroAXB = off
+SpaceShower:rapidityOrder = on
+SpaceShower:alphaSorder = 2
+SpaceShower:alphaSvalue = 0.118
+SpaceShower:pT0Ref      = 1.56
+SpaceShower:pTmaxFudge  = 0.91
+SpaceShower:pTdampFudge = 1.05
+TimeShower:alphaSorder  = 2
+TimeShower:alphaSvalue  = 0.118

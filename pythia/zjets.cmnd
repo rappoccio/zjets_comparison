@@ -1,0 +1,29 @@
+! Z(->ee/mumu)+jet sample -> Z+jets channel of CMS_2026_PAS_SMP_25_010.
+! PYTHIA 8.3, simple shower, CMS CP5 tune.
+!
+! We use the Z+1-parton hard process with a pTHat cut so the recoiling jet
+! reaches the measured pT>200 GeV efficiently. For a fully merged prediction,
+! use MLM/CKKW-L merging or the madgraph/ (aMC@NLO) chain instead.
+
+Beams:idA = 2212
+Beams:idB = 2212
+Beams:eCM = 13000.
+Main:numberOfEvents = 100000
+
+! --- hard process: q qbar -> Z g  and  q g -> Z q ---
+WeakBosonAndParton:qqbar2gmZg = on
+WeakBosonAndParton:qg2gmZq    = on
+
+! Z/gamma* -> charged leptons only, in the data mass window region.
+WeakZ0:gmZmode = 2           ! pure Z (drop gamma* and interference); set 0 for full gamma*/Z
+23:onMode = off
+23:onIfAny = 11 13           ! Z -> e+e- , mu+mu-
+PhaseSpace:mHatMin = 60.
+
+! Recoil jet hard enough to enter the measurement.
+PhaseSpace:pTHatMin = 150.
+
+PartonShowers:model = 1      ! simple shower
+Init:showChangedSettings = on
+
+Next:numberCount = 10000
