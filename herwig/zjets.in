@@ -1,0 +1,43 @@
+##################################################################
+# Herwig 7 — Z(->ee/mumu) + jet, angular-ordered shower, with Rivet.
+# Analog of pythia/zjets.cmnd (LO Z+1-parton ME + parton shower).
+#
+# >>> VERIFY THIS BLOCK against your Herwig version: the internal Z+jet matrix
+#     element name and its Z-decay/cut switches have changed across releases.
+#     If `Herwig read zjets.in` errors on the MEPP2ZJet lines, check the example
+#     `LHC-*.in` files shipped under  $(dirname $(which Herwig))/../share/Herwig/.
+##################################################################
+read snippets/PPCollider.in
+
+cd /Herwig/Generators
+set EventGenerator:EventHandler:LuminosityFunction:Energy 13000.0
+
+##################################################################
+# Hard process: p p -> Z/gamma*(->charged leptons) + jet  (LO)
+##################################################################
+cd /Herwig/MatrixElements
+create Herwig::MEPP2ZJet MEZJet
+set MEZJet:GammaZ Z                 # pure Z (drop gamma*/interference)
+set MEZJet:ZDecay ChargedLeptons    # Z -> e+e- , mu+mu-
+insert SubProcess:MatrixElements[0] MEZJet
+
+# Require a hard recoil jet (so the leading jet can reach the measured pT>200),
+# and a sane dilepton mass window.
+cd /Herwig/Cuts
+set JetKtCut:MinKT   150.0*GeV
+set MassCut:MinM      60.0*GeV
+set MassCut:MaxM     120.0*GeV
+
+##################################################################
+# Rivet hook -> our analysis
+##################################################################
+cd /Herwig/Analysis
+create ThePEG::RivetAnalysis Rivet RivetAnalysis.so
+insert Rivet:Analyses 0 CMS_2026_PAS_SMP_25_010
+cd /Herwig/Generators
+insert EventGenerator:AnalysisHandlers 0 /Herwig/Analysis/Rivet
+
+##################################################################
+# Build the run (events + seed are given on the `Herwig run` command line).
+##################################################################
+saverun zjets EventGenerator

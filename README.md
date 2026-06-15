@@ -13,6 +13,7 @@ vi config.sh          # set LCG_VIEW (Rivet >= 4.0); tune NEV/NSEEDS if you like
 
 ./submit_pythia8.sh   # one batch per generator (each independent)
 ./submit_vincia.sh
+./submit_herwig.sh
 ./submit_amcnlo.sh
 condor_q              #   ...watch them finish...
 
@@ -33,12 +34,12 @@ config.sh             SHARED settings only (LCG view, NEV/NSEEDS, paths) — edi
 prepare.sh            one-time build of the plugin + pythia8-rivet driver
 
 submit_pythia8.sh     ┐ per-generator submit scripts (thin wrappers)
-submit_vincia.sh      │   showers: _submit_shower.sh + gen_job.sh  -> yodas/{pythia8,vincia}/
-submit_amcnlo.sh      ┘   aMC@NLO: gen_amcnlo_job.sh               -> yodas/amcnlo/
+submit_vincia.sh      │   showers (pythia/vincia): _submit_shower.sh + gen_job.sh
+submit_herwig.sh      │   herwig:  gen_herwig_job.sh   -> yodas/herwig/
+submit_amcnlo.sh      ┘   aMC@NLO: gen_amcnlo_job.sh   -> yodas/amcnlo/
 submit_lib.sh         shared condor_launch() used by all submit scripts
 gen.sub               static HTCondor description (executable/args/queue appended)
-gen_job.sh            shower payload (one seed)
-gen_amcnlo_job.sh     aMC@NLO payload (one seed)
+gen_job.sh / gen_herwig_job.sh / gen_amcnlo_job.sh   per-generator payloads (one seed)
 
 merge_plot.sh         sum every yodas/<gen>/ -> build_comparison.py -> rivet-mkhtml
 build_comparison.py   slice each 2D prediction to per-slice unit-area 1D + /REF from npz
@@ -46,6 +47,7 @@ build_comparison.py   slice each 2D prediction to per-slice unit-area 1D + /REF 
 CMS_2026_PAS_SMP_25_010.cc      the Rivet analysis (2D, HepData binning)
 hepdata_export_{groomed,ungroomed}.npz   the data
 pythia/    main_rivet.cc, Makefile, cp5.cmnd, zjets.cmnd
+herwig/    zjets.in           (Herwig steering — verify the process block)
 madgraph/  zjets.mg5 (reference), zjets_batch.mg5 (@SEED@/@NEV@ template)
 lhapdf-cache/   CP5 PDF (NNPDF31_nnlo_as_0118), used if CVMFS lacks it
 ```
@@ -75,10 +77,18 @@ within its pT slice.
 |----------------------|--------------------------------|-------------|-----------------|
 | `submit_pythia8.sh`  | PYTHIA8 simple shower          | `NSEEDS`    | `yodas/pythia8` |
 | `submit_vincia.sh`   | PYTHIA8 + VINCIA shower         | `NSEEDS`    | `yodas/vincia`  |
+| `submit_herwig.sh`   | HERWIG7 angular-ordered shower | `NSEEDS`    | `yodas/herwig`  |
 | `submit_amcnlo.sh`   | aMC@NLO `p p > z j [QCD]` + PY8 | `NSEEDS_MG` | `yodas/amcnlo`  |
 
 Each is independent. `merge_plot.sh` overlays whichever ones have produced YODAs —
-no need to run all three. (aMC@NLO needs an LCG view that also provides MadGraph.)
+no need to run them all. aMC@NLO and Herwig need an LCG view that also ships
+MadGraph / Herwig7 (the recent ones do).
+
+> **Herwig caveat:** `herwig/zjets.in` is the one steering file not validated here.
+> Herwig's internal Z+jet ME and its decay/cut switches vary by release — if
+> `Herwig read` errors, adjust the marked process block (compare with the
+> `LHC-*.in` examples shipped in the Herwig share dir). Do the `NSEEDS=2` test
+> first.
 
 ## Notes
 
