@@ -1,0 +1,53 @@
+# Sherpa 3.x — Z(->e+e-/mu+mu-) + jets, MEPS@LO (CKKW-L merged 0,1,2 extra jets),
+# with the native Rivet hook into our analysis. Self-contained (ME+PS+hadronization),
+# like Herwig — no external shower step.
+#
+# >>> VERSION: this is Sherpa 3.x YAML. If `Sherpa --version` is 2.2.x on your LCG
+#     view, this file won't parse — that release uses the old Run.dat ini format.
+#     Confirm with `Sherpa --version` first (HANDOFF.md CHECK item).
+#
+# First invocation builds the process libraries (slow); prepare.sh does that once
+# with INIT_ONLY and caches Process/ + Results/ so the batch jobs skip it.
+
+TAGS:
+  NJET: 2       # up to 2 extra ME jets merged onto the Z
+  QCUT: 20      # CKKW-L merging scale (GeV)
+
+# --- beams: pp @ 13 TeV ---
+BEAMS: 2212
+BEAM_ENERGIES: 6500
+
+# --- PDF: NNPDF31 (match the other generators) ---
+PDF_LIBRARY: LHAPDFSherpa
+PDF_SET: NNPDF31_nnlo_as_0118
+
+ME_GENERATORS: [Comix, Amegic]
+
+# Z width on-shell handling + restrict to e/mu channels via the process list below.
+PARTICLE_DATA:
+  23: {Width: 0}
+
+PROCESSES:
+- 93 93 -> 11 -11 93{NJET}:
+    Order: {QCD: 0, EW: 2}
+    CKKW: $(QCUT)
+- 93 93 -> 13 -13 93{NJET}:
+    Order: {QCD: 0, EW: 2}
+    CKKW: $(QCUT)
+
+SELECTORS:
+# dilepton mass window (Z) ...
+- [Mass, 11, -11, 60, 120]
+- [Mass, 13, -13, 60, 120]
+# ... and require a hard ME jet so the leading jet reaches the measured pT>200
+# efficiently (generation-level enrichment, analog of ptj=150 elsewhere).
+- [PT, 93, 150, E_CMS]
+
+# --- Rivet hook -> our analysis (Sherpa writes <runname>.yoda) ---
+ANALYSIS: Rivet
+RIVET:
+  ANALYSES:
+    - CMS_2026_PAS_SMP_25_010
+
+# Use the nominal (CKKW-merged) weight for the YODA fill.
+EVENT_OUTPUT: None

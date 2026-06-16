@@ -1,0 +1,53 @@
+# POWHEG-BOX Z+jet (Zj) input — NLO Z+1-jet.  @SEED@ / @NEV@ substituted per job.
+# Process directory: POWHEG-BOX-V2/Zj  (binary `pwhg_main`).
+#
+# We use the Zj process (Z at NLO with a jet already at Born), NOT plain Z, so the
+# leading jet reaches the measured pT and the jet-mass observable is populated.
+# The Born has a final-state parton, so a generation cut (bornktmin) is required.
+
+numevts   @NEV@
+iseed     @SEED@
+
+! beams: pp @ 13 TeV
+ih1   1
+ih2   1
+ebeam1 6500d0
+ebeam2 6500d0
+
+! PDF (LHAPDF): NNPDF31_nnlo_as_0118
+lhans1 325300
+lhans2 325300
+
+! Z decay: vdecaymode 1=e, 2=mu, 3=tau. Run electrons here; submit a second batch
+! with vdecaymode 2 (muons) if you want both channels (the analysis takes e+mu).
+vdecaymode 1
+min_z_mass 60d0
+max_z_mass 120d0
+
+! Born-level generation cut on the jet (GeV) + suppression so the high-pT tail is
+! sampled. bornktmin regularises the Born singularity; bornsuppfact reweights.
+bornktmin     120d0
+bornsuppfact  300d0
+
+! NLO / POWHEG technicals (standard Zj defaults).
+ncall1   50000
+itmx1    5
+ncall2   100000
+itmx2    5
+foldcsi  2
+foldy    5
+foldphi  2
+nubound  100000
+icsimax  3
+iymax    3
+bornonly 0
+withdamp 1
+hdamp    250d0
+ptsqmin  0.8d0
+charmthr  1.5d0
+bottomthr 5.0d0
+testplots 0
+bornktmin2 0d0
+
+! Z+jet specifics
+runningscales 1

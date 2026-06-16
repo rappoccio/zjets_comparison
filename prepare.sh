@@ -15,8 +15,8 @@ cd "$PKG"
 rivet-build RivetCMS_2026_PAS_SMP_25_010.so CMS_2026_PAS_SMP_25_010.cc \
     $(fastjet-config --cxxflags --libs) -lfastjetcontribfragile
 
-echo ">>> building pythia8-rivet driver"
-cd "$PKG/pythia" && make
+echo ">>> building pythia8-rivet driver (+ powheg8-rivet for the POWHEG chain)"
+cd "$PKG/pythia" && make all
 
 # aMC@NLO's NLO shower step calls `bc`, which batch worker nodes often lack (and
 # you can't apt-get there). Stash a copy from this login node so the jobs find it
@@ -31,4 +31,29 @@ else
   echo "    WARN: bc not found on this node — aMC@NLO showering will be skipped on workers" >&2
 fi
 
-echo ">>> OK: plugin + pythia8-rivet (+ bundled bc) are ready"
+# --- POWHEG-BOX Zj binary (optional; only needed for submit_powheg.sh) ---
+# If POWHEG-BOX is in CVMFS, copy/symlink the Zj `pwhg_main` to powheg/pwhg_main;
+# otherwise build the Zj process once from source. CHECK first:
+#   ls /cvmfs/sft.cern.ch/lcg/releases/MCGenerators/powheg-box*/ 2>/dev/null
+if [ ! -x "$PKG/powheg/pwhg_main" ]; then
+  PWHG_CVMFS=$(ls -d /cvmfs/sft.cern.ch/lcg/releases/MCGenerators/powheg-box*/*/*/Zj/pwhg_main 2>/dev/null | head -1 || true)
+  if [ -n "$PWHG_CVMFS" ]; then
+    cp -f "$PWHG_CVMFS" "$PKG/powheg/pwhg_main"
+    echo ">>> POWHEG: copied Zj pwhg_main from $PWHG_CVMFS"
+  else
+    echo ">>> POWHEG: Zj pwhg_main not found in CVMFS — build it once and drop the" >&2
+    echo "           binary at $PKG/powheg/pwhg_main (see HANDOFF.md §3). Skipping." >&2
+  fi
+fi
+
+# --- Sherpa process libraries (optional; only needed for submit_sherpa.sh) ---
+# Build the process libs ONCE so batch jobs skip the slow Comix/Amegic compile.
+if command -v Sherpa >/dev/null && [ ! -d "$PKG/sherpa/Process" ]; then
+  echo ">>> Sherpa: building process libraries (INIT_ONLY; slow, one-off)"
+  ( cd "$PKG/sherpa" && RIVET_ANALYSIS_PATH="$PKG" Sherpa -f Sherpa.yaml INIT_ONLY=1 \
+      && [ -f makelibs ] && ./makelibs ) \
+    || echo "    WARN: Sherpa INIT failed (check Sherpa --version: YAML needs 3.x)." >&2
+fi
+
+echo ">>> OK: plugin + pythia8-rivet + powheg8-rivet (+ bundled bc) ready"
+echo "    (POWHEG pwhg_main and Sherpa Process/ built above only if available.)"

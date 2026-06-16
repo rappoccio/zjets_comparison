@@ -21,6 +21,12 @@ LDLIBS   := $(PYTHIA_LD) $(RIVET_LD) $(HEPMC_LD)
 pythia8-rivet: main_rivet.cc
 	$(CXX) $(CXXFLAGS) $< -o $@ $(LDLIBS)
 
+# POWHEG variant: same driver + the PowhegHooks pT-veto (Pythia8Plugins).
+powheg8-rivet: main_rivet_powheg.cc
+	$(CXX) $(CXXFLAGS) $< -o $@ $(LDLIBS)
+
+all: pythia8-rivet powheg8-rivet
+
 clean:
-	rm -f pythia8-rivet
-.PHONY: clean
+	rm -f pythia8-rivet powheg8-rivet
+.PHONY: all clean

@@ -1,0 +1,56 @@
+##################################################################
+# Herwig 7 — shower an EXISTING (aMC@NLO) Les Houches event file and analyse with
+# Rivet. Used by the amcnlo_herwig chain: MadGraph writes the parton-level LHE
+# (parton_shower=HERWIGPP counterterms), Herwig reads + showers + hadronises it.
+#
+# This is the analog of `pythia8-rivet  <cmnd with Beams:frameType=4>  out.yoda`
+# but for Herwig. No internal matrix element here — the hard events come from the
+# LHE, so we do NOT insert MEZJet.
+#
+# @LHE@ is substituted by gen_amcnlo_herwig_job.sh with the unzipped LHE path.
+##################################################################
+read snippets/PPCollider.in
+
+##################################################################
+# Les Houches reader: read the MadGraph LHE. WeightOption VarNegWeight keeps the
+# MC@NLO negative weights (the YODA fill then carries the nominal weight).
+##################################################################
+cd /Herwig/EventHandlers
+create ThePEG::LesHouchesFileReader LHEReader
+set LHEReader:FileName @LHE@
+set LHEReader:WeightWarnings false
+set LHEReader:AllowedToReOpen No
+set LHEReader:InitPDFs 0
+set LHEReader:CacheFileName .lhecache
+set LHEReader:MaxScan 5
+
+# Beams / PDF: take the proton-proton extractor + PDFs from the PPCollider snippet.
+set LHEReader:PartonExtractor /Herwig/Partons/PPExtractor
+set LHEReader:PDFA /Herwig/Partons/HardLOPDF
+set LHEReader:PDFB /Herwig/Partons/HardLOPDF
+
+create ThePEG::LesHouchesEventHandler LHEHandler
+set LHEHandler:WeightOption VarNegWeight
+insert LHEHandler:LesHouchesReaders 0 LHEReader
+set LHEHandler:PartonExtractor      /Herwig/Partons/PPExtractor
+set LHEHandler:CascadeHandler       /Herwig/Shower/ShowerHandler
+set LHEHandler:HadronizationHandler /Herwig/Hadronization/ClusterHadHandler
+set LHEHandler:DecayHandler         /Herwig/Decays/DecayHandler
+
+cd /Herwig/Generators
+set EventGenerator:EventHandler /Herwig/EventHandlers/LHEHandler
+set EventGenerator:EventHandler:LuminosityFunction:Energy 13000.0
+
+##################################################################
+# Rivet hook -> our analysis (identical to zjets.in).
+##################################################################
+cd /Herwig/Analysis
+create ThePEG::RivetAnalysis Rivet RivetAnalysis.so
+insert Rivet:Analyses 0 CMS_2026_PAS_SMP_25_010
+cd /Herwig/Generators
+insert EventGenerator:AnalysisHandlers 0 /Herwig/Analysis/Rivet
+
+##################################################################
+# Build the run (events + seed are given on the `Herwig run` command line).
+##################################################################
+saverun zjets_hw EventGenerator

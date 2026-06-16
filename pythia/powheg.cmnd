@@ -1,0 +1,27 @@
+! PYTHIA 8.3 settings for showering a POWHEG-BOX LHE with correct NLO matching.
+! Used by powheg8-rivet (which installs the PowhegHooks pT-veto). The CP5 tune
+! block (UE/MPI/CR + NNPDF31 PDF) is prepended by gen_powheg_job.sh from cp5.cmnd,
+! so this file holds ONLY the POWHEG matching keys + LHE input wiring.
+!
+! Reference: PYTHIA's main31.cc / PowhegHooks documentation.
+
+! --- LHE input (Beams:LHEF is appended by the job script) ---
+Beams:frameType = 4
+
+! --- POWHEG matching (read by PowhegHooks) ---
+POWHEG:nFinal    = 2      ! Born final-state multiplicity for Zj: (Z) + 1 jet = 2
+POWHEG:veto      = 1      ! enable the pT veto
+POWHEG:vetoCount = 100    ! consecutive vetoes before regenerating
+POWHEG:pThard    = 0      ! pThard from the SCALUP in the LHE
+POWHEG:pTemt     = 0
+POWHEG:emitted   = 0
+POWHEG:pTdef     = 1
+POWHEG:MPIveto   = 0
+POWHEG:QEDveto   = 2
+
+! --- let POWHEG set the hard scale; the hook does the matching veto ---
+SpaceShower:pTmaxMatch = 2
+TimeShower:pTmaxMatch  = 2
+
+! --- keep Z->ee/mumu only if POWHEG wrote a fully-decayed Z (it does here) ---
+! (no decay overrides: the leptons come from the LHE)
