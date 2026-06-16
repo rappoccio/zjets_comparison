@@ -118,6 +118,63 @@ is the only valid way to pair MadGraph with VINCIA, and gives a clean LO+PS comp
 > `Herwig read` errors, adjust the marked process block (compare with the `LHC-*.in`
 > examples shipped in the Herwig share dir). Do the `NSEEDS=2` test first.
 
+## Local testing (do this before every batch)
+
+Each generator ships a **local tester** that runs the exact same chain as its
+HTCondor payload, but interactively: no Condor, no `xrdcp`, verbose, and it keeps
+its run directory so you can inspect the output. Always smoke-test a generator
+locally on an lxplus login (or any node with the LCG view) **before** submitting a
+batch — it's the fastest way to catch a steering/version problem.
+
+Run from the package root. All take small defaults so a test is quick:
+
+| generator(s)         | command                                       | args (defaults)                | first-run cost |
+|----------------------|-----------------------------------------------|--------------------------------|----------------|
+| pythia8 / vincia     | `./pythia/run_local.sh [MODEL] [NEV] [SEED]`  | MODEL 1=PY8/CP5, **2**=VINCIA; NEV 2000; SEED 1 | builds plugin |
+| herwig               | `./herwig/run_local.sh [NEV] [SEED]`          | NEV 1000; SEED 1               | — |
+| amcnlo               | `./madgraph/run_local.sh [NEV] [SEED]`        | NEV 2000; SEED 1               | aMC@NLO compiles the process |
+| amcnlo_herwig        | `./madgraph/run_local_herwig.sh [NEV] [SEED]` | NEV 1000; SEED 1               | aMC@NLO compiles the process |
+| mglo_pythia / mglo_vincia | `./madgraph/run_local_lo.sh [MODEL] [NEV] [SEED]` | MODEL **1**=PY8/CP5, 2=VINCIA; NEV 2000; SEED 1 | MadGraph compiles the LO process |
+| mglo_herwig          | `./madgraph/run_local_lo_herwig.sh [NEV] [SEED]` | NEV 1000; SEED 1            | MadGraph compiles the LO process |
+| powheg               | `./powheg/run_local.sh [NEV] [SEED]`          | NEV 2000; SEED 1               | needs a `Zj` `pwhg_main` |
+| sherpa               | `./sherpa/run_local.sh [NEV] [SEED]`          | NEV 500; SEED 1                | builds Comix/**Amegic** process libs |
+
+What a successful run produces: a `*.yoda` (path printed at the end; the run dir is
+kept under `<gen>/local_run/` or similar). Sanity-check it before scaling up:
+
+```bash
+yoda ls <gen>/local_run/<file>.yoda | grep CMS_2026_PAS_SMP_25_010   # histos filled?
+```
+
+Recommended progression for any generator: **local tester** → tiny Condor test
+(`NSEEDS=2 NEV=2000 ./submit_<gen>.sh`) → `merge_plot.sh` (eyeball the curve and
+confirm jobs finish inside `JOBFLAVOUR`) → full `./submit_<gen>.sh`.
+
+### Per-generator gotchas seen in local testing
+
+- **Sherpa** — two real issues, both now fixed in the scripts:
+  1. *Missing library at startup* (`libSherpaHepMC3Output.so.0.0.0: cannot open
+     shared object file`). The LCG_107 view doesn't put Sherpa's `lib64/SHERPA-MC`
+     on `LD_LIBRARY_PATH`. `run_local.sh`, `gen_sherpa_job.sh`, and `prepare.sh`
+     locate that plugin under the Sherpa release tree and prepend its dir.
+  2. *`Failed to parse NJET`* — in Sherpa 3.x YAML a `TAGS:` entry is only
+     substituted when referenced as `$(NAME)`. The process multiplicity must be
+     `93{$(NJET)}` (not `93{NJET}`); `CKKW: $(QCUT)` was already correct.
+
+  **Before submitting Sherpa:** the local run builds the Comix/Amegic process libs
+  under `sherpa/local_run/`. The batch jobs read them from `sherpa/Process` (+
+  `sherpa/Results`) so all jobs skip the (slow) recompile/re-integration — lift them
+  up once: `cp -a sherpa/local_run/Process sherpa/local_run/Results sherpa/`
+  (or rerun `./prepare.sh`). Also note `MEPS@LO` is much slower per event than a
+  plain shower, so test the per-job walltime before the full `NSEEDS×NEV`.
+
+- **Herwig** (`herwig`/`amcnlo_herwig`/`mglo_herwig`) — see the Herwig caveat above;
+  the internal-ME steering and the LHE-reader PDF lines are release-sensitive. If
+  `Herwig read` errors, compare with the `LHC-*.in` examples in the Herwig share dir.
+
+- **powheg** — needs a `Zj` `pwhg_main` (from CVMFS or built once by `prepare.sh`);
+  the local tester errors out early if it isn't present.
+
 ## Notes
 
 - Keep the package on **EOS** so HTCondor workers can read inputs. `prepare.sh`
