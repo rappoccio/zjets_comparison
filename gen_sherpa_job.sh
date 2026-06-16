@@ -16,6 +16,13 @@ lhapdf ls --installed 2>/dev/null | grep -q NNPDF31_nnlo_as_0118 \
   || export LHAPDF_DATA_PATH="$PKG/lhapdf-cache:${LHAPDF_DATA_PATH:-}"
 command -v Sherpa >/dev/null || { echo "Sherpa not in this LCG view" >&2; exit 1; }
 
+# LCG_107: Sherpa's HepMC3 output plugin (libSherpaHepMC3Output.so), a NEEDED lib of
+# the Sherpa executable, is not exposed on LD_LIBRARY_PATH by the view → locate it
+# under the real Sherpa release tree and prepend its dir (no-op if already resolved).
+_shp=$(find "$(readlink -f "$(command -v Sherpa)" | sed 's#/bin/Sherpa$##')" \
+  -name 'libSherpaHepMC3Output.so*' 2>/dev/null | head -1 || true)
+if [ -n "${_shp:-}" ]; then export LD_LIBRARY_PATH="$(dirname "$_shp"):${LD_LIBRARY_PATH:-}"; fi
+
 SCRATCH="${_CONDOR_SCRATCH_DIR:-${TMPDIR:-/tmp}}/sherpa_${SEED}"
 mkdir -p "$SCRATCH" && cd "$SCRATCH"
 cp "$PKG/sherpa/Sherpa.yaml" .

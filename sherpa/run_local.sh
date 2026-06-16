@@ -22,6 +22,13 @@ echo "rivet  : $(rivet --version 2>/dev/null)"
 command -v Sherpa >/dev/null || { echo "no Sherpa in this LCG view"; exit 1; }
 [ -f "$PKG/RivetCMS_2026_PAS_SMP_25_010.so" ] || { echo ">>> building plugin"; ( cd "$PKG" && ./prepare.sh ); }
 
+# LCG_107: Sherpa's HepMC3 output plugin (libSherpaHepMC3Output.so), a NEEDED lib of
+# the Sherpa executable, is not exposed on LD_LIBRARY_PATH by the view → locate it
+# under the real Sherpa release tree and prepend its dir (no-op if already resolved).
+_shp=$(find "$(readlink -f "$(command -v Sherpa)" | sed 's#/bin/Sherpa$##')" \
+  -name 'libSherpaHepMC3Output.so*' 2>/dev/null | head -1 || true)
+if [ -n "${_shp:-}" ]; then export LD_LIBRARY_PATH="$(dirname "$_shp"):${LD_LIBRARY_PATH:-}"; fi
+
 WORK="$PKG/sherpa/local_run"; mkdir -p "$WORK"; cd "$WORK"
 cp "$PKG/sherpa/Sherpa.yaml" .
 echo "=== Sherpa.yaml ==="; cat Sherpa.yaml; echo "==================="

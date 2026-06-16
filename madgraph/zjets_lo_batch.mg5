@@ -1,0 +1,29 @@
+# LO MadGraph Z+jet card for BATCH use.  @SEED@ / @NEV@ substituted per job.
+#
+# LO `p p > z j` (NO [QCD], so NO MC@NLO counterterms): the written LHE is plain
+# tree-level, valid input to ANY shower. The three mglo_* chains shower this same
+# card with Pythia8 / VINCIA / Herwig7 respectively — a pure parton-shower
+# comparison (LO ME + PS), complementary to the NLO amcnlo* chains.
+#
+# Z decay is done in the matrix element (decay chain), so no MadSpin step. shower=OFF
+# because the LCG MadGraph has no runnable shower interface anyway — we shower the
+# LHE externally.
+import model sm
+define j = g u c d s b u~ c~ d~ s~ b~
+generate p p > z j, z > l+ l-
+output zjets_lo -f
+
+launch zjets_lo
+shower=OFF
+reweight=OFF
+# --- run_card (LO) ---
+set ebeam1   6500
+set ebeam2   6500
+set pdlabel  lhapdf
+set lhaid    325300        # NNPDF31_nnlo_as_0118
+set ptj      150           # recoil-jet generation cut (reach measured pT>200)
+set ptl      15
+set mll      50
+set nevents  @NEV@
+set iseed    @SEED@         # distinct random seed per job
+set use_syst False

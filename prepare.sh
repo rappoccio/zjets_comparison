@@ -49,6 +49,11 @@ fi
 # --- Sherpa process libraries (optional; only needed for submit_sherpa.sh) ---
 # Build the process libs ONCE so batch jobs skip the slow Comix/Amegic compile.
 if command -v Sherpa >/dev/null && [ ! -d "$PKG/sherpa/Process" ]; then
+  # LCG_107: Sherpa's HepMC3 output plugin (libSherpaHepMC3Output.so) is not exposed
+  # on LD_LIBRARY_PATH by the view → locate it and prepend its dir (no-op if resolved).
+  _shp=$(find "$(readlink -f "$(command -v Sherpa)" | sed 's#/bin/Sherpa$##')" \
+    -name 'libSherpaHepMC3Output.so*' 2>/dev/null | head -1 || true)
+  if [ -n "${_shp:-}" ]; then export LD_LIBRARY_PATH="$(dirname "$_shp"):${LD_LIBRARY_PATH:-}"; fi
   echo ">>> Sherpa: building process libraries (INIT_ONLY; slow, one-off)"
   ( cd "$PKG/sherpa" && RIVET_ANALYSIS_PATH="$PKG" Sherpa -f Sherpa.yaml INIT_ONLY=1 \
       && [ -f makelibs ] && ./makelibs ) \
