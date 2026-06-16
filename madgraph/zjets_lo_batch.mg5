@@ -5,16 +5,15 @@
 # card with Pythia8 / VINCIA / Herwig7 respectively — a pure parton-shower
 # comparison (LO ME + PS), complementary to the NLO amcnlo* chains.
 #
-# Z decay is done in the matrix element (decay chain), so no MadSpin step. shower=OFF
-# because the LCG MadGraph has no runnable shower interface anyway — we shower the
-# LHE externally.
+# Z decay is done in the matrix element (decay chain), so no MadSpin step. No shower
+# switch is set: the LCG MadGraph has no runnable shower interface (shower = Not
+# Avail.), so 'shower=OFF' just errors out — we shower the LHE externally instead.
 import model sm
 define j = g u c d s b u~ c~ d~ s~ b~
 generate p p > z j, z > l+ l-
 output zjets_lo -f
 
 launch zjets_lo
-shower=OFF
 reweight=OFF
 # --- run_card (LO) ---
 set ebeam1   6500
@@ -23,7 +22,7 @@ set pdlabel  lhapdf
 set lhaid    325300        # NNPDF31_nnlo_as_0118
 set ptj      150           # recoil-jet generation cut (reach measured pT>200)
 set ptl      15
-set mll      50
+set mmll     50
 set nevents  @NEV@
 set iseed    @SEED@         # distinct random seed per job
 set use_syst False

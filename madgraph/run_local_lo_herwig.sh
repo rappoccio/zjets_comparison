@@ -27,7 +27,8 @@ echo "=== card.mg5 ==="; cat card.mg5; echo "================"
 
 echo ">>> mg5_aMC card.mg5 (LO) — writes the LO LHE"
 mg5_aMC card.mg5 || echo ">>> mg5_aMC exit $? (continuing to the LHE)"
-LHE=$(ls -t zjets_lo*/Events/run_01*/events.lhe.gz 2>/dev/null | head -1 || true)
+LHE=$(ls -t zjets_lo*/Events/run_01*/unweighted_events.lhe.gz 2>/dev/null | head -1 || true)
+[ -n "$LHE" ] || LHE=$(ls -t zjets_lo*/Events/run_01*/events.lhe.gz 2>/dev/null | head -1 || true)
 [ -n "$LHE" ] || { echo ">>> NO LHE produced — see output above. Run dir kept: $WORK"; exit 1; }
 gunzip -kf "$LHE"; LHE=$(readlink -f "${LHE%.gz}")
 echo ">>> showering LO LHE with Herwig7: $LHE"

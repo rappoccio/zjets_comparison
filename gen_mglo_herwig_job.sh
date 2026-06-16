@@ -26,7 +26,8 @@ sed -e "s/@SEED@/$SEED/g" -e "s/@NEV@/$NEV/g" "$PKG/madgraph/zjets_lo_batch.mg5"
 echo ">>> mg5_aMC LO (seed $SEED, $NEV events) — writes the LO LHE"
 mg5_aMC card.mg5 || echo ">>> mg5_aMC returned $? (checking for the LHE anyway)"
 
-LHE=$(ls -t zjets_lo*/Events/run_01*/events.lhe.gz 2>/dev/null | head -1 || true)
+LHE=$(ls -t zjets_lo*/Events/run_01*/unweighted_events.lhe.gz 2>/dev/null | head -1 || true)
+[ -n "$LHE" ] || LHE=$(ls -t zjets_lo*/Events/run_01*/events.lhe.gz 2>/dev/null | head -1 || true)
 [ -n "$LHE" ] || { echo "no LHE produced by MadGraph" >&2; exit 1; }
 gunzip -kf "$LHE"; LHE="${LHE%.gz}"
 LHE=$(readlink -f "$LHE")

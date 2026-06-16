@@ -29,7 +29,8 @@ echo "=== card.mg5 ==="; cat card.mg5; echo "================"
 
 echo ">>> mg5_aMC card.mg5 (LO) — writes the LO LHE"
 mg5_aMC card.mg5 || echo ">>> mg5_aMC exit $? (continuing to the LHE)"
-LHE=$(ls -t zjets_lo*/Events/run_01*/events.lhe.gz 2>/dev/null | head -1 || true)
+LHE=$(ls -t zjets_lo*/Events/run_01*/unweighted_events.lhe.gz 2>/dev/null | head -1 || true)
+[ -n "$LHE" ] || LHE=$(ls -t zjets_lo*/Events/run_01*/events.lhe.gz 2>/dev/null | head -1 || true)
 [ -n "$LHE" ] || { echo ">>> NO LHE produced — see output above. Run dir kept: $WORK"; exit 1; }
 gunzip -kf "$LHE"; LHE="${LHE%.gz}"; NIN=$(grep -c '<event>' "$LHE" 2>/dev/null || echo 0)
 echo ">>> showering $NIN-event LO LHE with pythia8-rivet (model $MODEL): $LHE"
