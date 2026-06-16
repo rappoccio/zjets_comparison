@@ -13,13 +13,16 @@ cd /Herwig/Generators
 set EventGenerator:EventHandler:LuminosityFunction:Energy 13000.0
 
 ##################################################################
-# Hard process: p p -> Z/gamma*(->charged leptons) + jet  (LO)
+# Hard process: p p -> Z/gamma*(->e/mu) + jet  (LO)
+# MEZJet (Herwig::MEPP2ZJet) is already defined in the default repository, so we
+# just enable it (do NOT `create` it).
 ##################################################################
 cd /Herwig/MatrixElements
-create Herwig::MEPP2ZJet MEZJet
-set MEZJet:GammaZ Z                 # pure Z (drop gamma*/interference)
-set MEZJet:ZDecay ChargedLeptons    # Z -> e+e- , mu+mu-
 insert SubProcess:MatrixElements[0] MEZJet
+
+# Restrict the Z decay to e+e- / mu+mu- so events match the analysis' Z->ee/mumu
+# selection (otherwise most Z's decay hadronically and are wasted).
+do /Herwig/Particles/Z0:SelectDecayModes Z0->e-,e+; Z0->mu-,mu+;
 
 # Require a hard recoil jet (so the leading jet can reach the measured pT>200),
 # and a sane dilepton mass window.
