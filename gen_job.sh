@@ -17,7 +17,9 @@ cd "$PKG/pythia"
 SCRATCH="${_CONDOR_SCRATCH_DIR:-${TMPDIR:-/tmp}}/jm_${TAG}_${SEED}"
 mkdir -p "$SCRATCH"
 CARD="$SCRATCH/run.cmnd"
-cat cp5.cmnd zjets.cmnd > "$CARD"
+# VINCIA (model 2) needs its own tune — the simple-shower CP5 settings break it.
+TUNE=cp5.cmnd; [ "$MODEL" = "2" ] && TUNE=vincia.cmnd
+cat "$TUNE" zjets.cmnd > "$CARD"
 echo "PartonShowers:model = $MODEL"                     >> "$CARD"
 printf 'Random:setSeed = on\nRandom:seed = %s\n' "$SEED" >> "$CARD"
 

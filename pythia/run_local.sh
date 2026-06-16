@@ -30,7 +30,9 @@ grep -oE 'PartonShowers:model[^>]*max="[0-9]+"' \
 
 WORK="$PKG/pythia/local_${TAG}"; rm -rf "$WORK"; mkdir -p "$WORK"
 CARD="$WORK/run.cmnd"
-cat "$PKG/pythia/cp5.cmnd" "$PKG/pythia/zjets.cmnd" > "$CARD"
+# VINCIA (model 2) needs its own tune; the simple-shower CP5 settings break it.
+TUNE=cp5.cmnd; [ "$MODEL" = "2" ] && TUNE=vincia.cmnd
+cat "$PKG/pythia/$TUNE" "$PKG/pythia/zjets.cmnd" > "$CARD"
 echo "PartonShowers:model = $MODEL"                     >> "$CARD"
 printf 'Random:setSeed = on\nRandom:seed = %s\n' "$SEED" >> "$CARD"
 echo "=== run card ($TAG, model $MODEL, $NEV events) ==="; cat "$CARD"; echo "==================="

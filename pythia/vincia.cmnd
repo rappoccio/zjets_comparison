@@ -1,0 +1,14 @@
+! VINCIA tune block (PartonShowers:model = 2).
+!
+! VINCIA manages its OWN shower and is tuned as a self-consistent package, so we
+! must NOT feed it the default/simple shower's SpaceShower:* / TimeShower:* / CP5
+! settings — doing so causes VINCIA kinematics to fail
+!   (VinciaISR pAccept > 1 ; VinciaCommon::map2to3IFlocal inconsistent ;
+!    BeamRemnants::setKinematics failed).
+! Hence this file deliberately contains almost nothing: just the PDF (kept the same
+! as the other generators) and VINCIA's own defaults for everything else.
+!
+! If pAccept>1 / kinematics failures persist, the NNLO PDF may be the culprit —
+! comment the PDF line out to fall back to VINCIA's default PDF.
+
+PDF:pSet = LHAPDF6:NNPDF31_nnlo_as_0118
