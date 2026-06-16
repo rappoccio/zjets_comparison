@@ -28,10 +28,10 @@ PARTICLE_DATA:
   23: {Width: 0}
 
 PROCESSES:
-- 93 93 -> 11 -11 93{NJET}:
+- 93 93 -> 11 -11 93{$(NJET)}:
     Order: {QCD: 0, EW: 2}
     CKKW: $(QCUT)
-- 93 93 -> 13 -13 93{NJET}:
+- 93 93 -> 13 -13 93{$(NJET)}:
     Order: {QCD: 0, EW: 2}
     CKKW: $(QCUT)
 
