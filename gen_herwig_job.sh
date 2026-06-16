@@ -14,18 +14,42 @@ SCRATCH="${_CONDOR_SCRATCH_DIR:-${TMPDIR:-/tmp}}/hw_${SEED}"
 mkdir -p "$SCRATCH" && cd "$SCRATCH"
 cp "$PKG/herwig/zjets.in" .
 
-# Herwig's `read snippets/...` needs its share/Herwig dir on the read search path.
-# Under a relocated LCG install the compiled-in path is wrong, so locate the real
-# share dir and symlink the snippets/defaults into cwd (works regardless of the
-# Herwig version's `read` flag syntax).
-HWSHARE=$(readlink -f "$(dirname "$(command -v Herwig)")/../share/Herwig" 2>/dev/null || true)
-[ -d "$HWSHARE/snippets" ] || { echo "cannot locate Herwig share dir (tried '$HWSHARE'); ls \$(dirname \$(command -v Herwig))/../share" >&2; exit 1; }
-ln -sf "$HWSHARE/snippets" snippets
-[ -d "$HWSHARE/defaults" ] && ln -sf "$HWSHARE/defaults" defaults
-echo ">>> using Herwig share: $HWSHARE"
+# Herwig's `read snippets/PPCollider.in` is resolved against Herwig's *read search
+# path*, NOT the cwd. Under a relocated LCG install the compiled-in path is wrong,
+# so (1) find where PPCollider.in actually lives and (2) add its parent to the
+# read path with whatever include flag this Herwig build supports.
+HWROOT=$(readlink -f "$(dirname "$(command -v Herwig)")/.." 2>/dev/null || true)
+READROOT=""
+if [ -f "$HWROOT/share/Herwig/snippets/PPCollider.in" ]; then
+  READROOT="$HWROOT/share/Herwig"
+else
+  PP=$(find "$HWROOT" -name PPCollider.in -print -quit 2>/dev/null || true)
+  [ -n "$PP" ] && READROOT=$(dirname "$(dirname "$PP")")
+fi
+if [ -z "$READROOT" ] || [ ! -f "$READROOT/snippets/PPCollider.in" ]; then
+  echo "ERROR: snippets/PPCollider.in not found under $HWROOT." >&2
+  echo "       This Herwig ($(Herwig --version 2>&1 | head -1)) likely predates the snippets" >&2
+  echo "       mechanism (7.2+). Send me that version and I'll provide a matching zjets.in." >&2
+  exit 1
+fi
+echo ">>> Herwig read root: $READROOT"
 
-echo ">>> Herwig read"
-Herwig read zjets.in
+# The LCG Herwig has its repository (HerwigDefaults.rpo) compiled to a
+# non-existent /build/jenkins/... path, so point it at the real CVMFS copy.
+RPO="$READROOT/HerwigDefaults.rpo"
+[ -f "$RPO" ] || { echo "ERROR: HerwigDefaults.rpo not at $RPO" >&2; exit 1; }
+
+# Pick the read-include option this build understands (for the snippet search path).
+HELP=$(Herwig read --help 2>&1 || true)
+INC=""
+for opt in --prepend-read --append-read -I -i; do
+  printf '%s\n' "$HELP" | grep -q -- "$opt" && { INC="$opt"; break; }
+done
+ln -sf "$READROOT/snippets" snippets        # cwd fallback for `read snippets/...`
+[ -d "$READROOT/defaults" ] && ln -sf "$READROOT/defaults" defaults
+
+echo ">>> Herwig read (repo: $RPO ; include: ${INC:-cwd})"
+Herwig read --repo "$RPO" ${INC:+$INC "$READROOT"} zjets.in
 echo ">>> Herwig run ($NEV events, seed $SEED)"
 Herwig run zjets.run -N "$NEV" -s "$SEED" -d 0
 
