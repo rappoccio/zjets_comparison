@@ -24,18 +24,5 @@ echo ">>> build_comparison.py: ${specs[*]%%=*}"
 python3 build_comparison.py "$PKG" out "${specs[@]}"
 
 cd out
-mkargs=()
-for f in mc_*.yoda; do t="${f#mc_}"; t="${t%.yoda}"; mkargs+=("$f:$t"); done
-mkargs+=("ref.yoda:CMS data")
-# Isolate matplotlib caches and disable problematic font config caching
-export MPLCONFIGDIR="${TMPDIR:-/tmp}/mpl-$$"
-export FONTCONFIG_PATH="/tmp/fc-$$"
-export MPLBACKEND=Agg
-mkdir -p "$MPLCONFIGDIR" "$FONTCONFIG_PATH"
-rivet-mkhtml -o ../html "${mkargs[@]}"
-
-# Post-process generated plot scripts to disable LaTeX rendering
-for py in ../html/CMS_2026_PAS_SMP_25_010/*.py; do
-  sed -i "s/^import matplotlib/import matplotlib\nmpl.rcParams['text.usetex'] = False/" "$py"
-done
+rivet-mkhtml -o ../html *.yoda
 echo ">>> plots: $PKG/html/index.html"
