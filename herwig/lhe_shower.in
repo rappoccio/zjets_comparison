@@ -31,6 +31,7 @@ set LesHouchesReader:FileName @LHE@
 set LesHouchesReader:AllowedToReOpen No
 set LesHouchesReader:InitPDFs 0
 set LesHouchesReader:WeightWarnings false
+set LesHouchesReader:MomentumTreatment RescaleEnergy
 set LesHouchesReader:Cuts /Herwig/EventHandlers/NoCuts
 set LesHouchesReader:PartonExtractor /Herwig/Partons/PPExtractor
 set LesHouchesReader:PDFA /Herwig/Partons/HardLOPDF
