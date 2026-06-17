@@ -38,6 +38,9 @@ def _scatter(path, value, eup, edn, title=None):
         p.setXErrs(xm - xlo, xhi - xm)
         p.setYErrs(float(edn[j]), float(eup[j]))
         s.addPoint(p)
+    # Set x-axis range to start at -4.5
+    s.setXMin(-4.5)
+    s.setXMax(0.0)
     return s
 
 
