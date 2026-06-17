@@ -12,6 +12,7 @@ cd /Herwig/Generators
 set EventGenerator:DebugLevel 0
 set EventGenerator:PrintEvent 10
 set EventGenerator:MaxErrors 10000
+set EventGenerator:NumberOfEvents @NEV@
 
 ##################################################
 # Create the Les Houches file handler and reader

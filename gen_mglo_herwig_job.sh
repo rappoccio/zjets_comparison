@@ -30,12 +30,13 @@ LHE=$(ls -t zjets_lo*/Events/run_01*/unweighted_events.lhe.gz 2>/dev/null | head
 [ -n "$LHE" ] || LHE=$(ls -t zjets_lo*/Events/run_01*/events.lhe.gz 2>/dev/null | head -1 || true)
 [ -n "$LHE" ] || { echo "no LHE produced by MadGraph" >&2; exit 1; }
 gunzip -kf "$LHE"; LHE="${LHE%.gz}"
+NIN=$(grep -c '<event>' "$LHE" 2>/dev/null || echo 0)
 LHE=$(readlink -f "$LHE")
-echo ">>> showering LO LHE with Herwig7: $LHE"
+echo ">>> showering $NIN-event LO LHE with Herwig7: $LHE"
 
 # 2. Herwig setup (same fixes as gen_amcnlo_herwig_job.sh / gen_herwig_job.sh).
 cp "$PKG/herwig/lhe_shower.in" .
-sed -i "s#@LHE@#$LHE#g" lhe_shower.in
+sed -i -e "s#@LHE@#$LHE#g" -e "s/@NEV@/$NIN/g" lhe_shower.in
 
 HWROOT=$(readlink -f "$(dirname "$(command -v Herwig)")/.." 2>/dev/null || true)
 READROOT=""

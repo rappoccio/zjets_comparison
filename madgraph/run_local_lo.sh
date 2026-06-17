@@ -45,7 +45,7 @@ if [ "$MODEL" = "3" ]; then
 
   # Set up Herwig
   cp "$PKG/herwig/lhe_shower.in" "$WORK/shower.in"
-  sed -i "s#@LHE@#$LHE#g" "$WORK/shower.in"
+  sed -i -e "s#@LHE@#$LHE#g" -e "s/@NEV@/$NIN/g" "$WORK/shower.in"
 
   HWROOT=$(readlink -f "$(dirname "$(command -v Herwig)")/.." 2>/dev/null || true)
   READROOT=""
