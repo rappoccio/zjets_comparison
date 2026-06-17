@@ -24,10 +24,13 @@ set LesHouchesHandler:CascadeHandler       /Herwig/Shower/ShowerHandler
 set LesHouchesHandler:HadronizationHandler /Herwig/Hadronization/ClusterHadHandler
 set LesHouchesHandler:DecayHandler         /Herwig/Decays/DecayHandler
 
+create ThePEG::Cuts NoCuts
+
 create ThePEG::LesHouchesFileReader LesHouchesReader
 set LesHouchesReader:FileName @LHE@
 set LesHouchesReader:AllowedToReOpen No
 set LesHouchesReader:InitPDFs 0
+set LesHouchesReader:Cuts /Herwig/EventHandlers/NoCuts
 set LesHouchesReader:PDFA /Herwig/Partons/HardLOPDF
 set LesHouchesReader:PDFB /Herwig/Partons/HardLOPDF
 insert LesHouchesHandler:LesHouchesReaders 0 LesHouchesReader
