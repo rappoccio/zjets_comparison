@@ -3,8 +3,6 @@
 # For MC@NLO events (IDWTUP=-4) with negative weights
 # @LHE@ substituted by gen_amcnlo_herwig_job.sh
 ##################################################
-read snippets/PPCollider.in
-
 ##################################################
 # Technical parameters
 ##################################################
@@ -55,7 +53,6 @@ set LesHouchesReader:Cuts /Herwig/Cuts/NoCuts
 set LesHouchesReader:MomentumTreatment RescaleEnergy
 set LesHouchesReader:PDFA /Herwig/Partons/LHAPDF
 set LesHouchesReader:PDFB /Herwig/Partons/LHAPDF
-set LesHouchesReader:Weighted On
 insert LesHouchesHandler:LesHouchesReaders 0 LesHouchesReader
 
 ##################################################

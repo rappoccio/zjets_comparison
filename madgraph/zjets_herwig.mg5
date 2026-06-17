@@ -33,3 +33,4 @@ set use_syst     False
 # --- MadSpin: Z -> charged leptons (e/mu) ---
 set spinmode     none
 decay z > l+ l-
+0
