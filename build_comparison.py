@@ -68,10 +68,28 @@ def build_truepythia(repo):
     return aos
 
 
+def _val_err(b):
+    """(value, abs-error) for one bin of a YODA-2 BinnedEstimate2D. Rivet 4
+    finalizes the 2D booking into an estimate, so bins expose val()/err(...)
+    rather than sumW()/sumW2(). err/errAvg may be scalar or (down, up)."""
+    v = float(b.val())
+    try:
+        e = b.errAvg()
+    except Exception:
+        try:
+            e = b.err()
+        except Exception:
+            e = 0.0
+    if isinstance(e, (tuple, list)):
+        e = 0.5 * (abs(e[0]) + abs(e[1]))
+    return v, float(e)
+
+
 def _cells(paths, groom):
-    """Sum sumW/sumW2 of the 2D <ANA>/zjets_<groom> over one or more YODA files,
-    keyed by (xbin_lo, ybin_lo). Summing raw counts across files = combining the
-    statistics of independent (different-seed) runs."""
+    """Sum (value, error^2) of the 2D <ANA>/zjets_<groom> over one or more YODA
+    files, keyed by (xbin_lo, ybin_lo). Summing across files combines the
+    independent (different-seed) runs; per-slice unit-area renormalization later
+    makes any per-file scaling irrelevant, so only the relative shape matters."""
     cells = {}
     for path in paths:
         objs = yoda.read(path)
@@ -81,7 +99,8 @@ def _cells(paths, groom):
         for b in h2.bins():
             k = (round(b.xMin(), 3), round(b.yMin(), 3))
             sw, sw2 = cells.get(k, (0., 0.))
-            cells[k] = (sw + b.sumW(), sw2 + b.sumW2())
+            v, e = _val_err(b)
+            cells[k] = (sw + v, sw2 + e * e)
     return cells
 
 
