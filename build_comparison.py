@@ -134,15 +134,16 @@ def build_mc(paths, title):
 
 def write_plot_files(outdir):
     """Write .plot files to control x-axis range for all histograms."""
-    plot_template = """# BEGIN PLOT
-XMin=-4.5
-XMax=0.0
-# END PLOT
-"""
     for groom in GROOMS:
         for s in range(NSLICE):
             # .plot files go in the same directory as the YODA files for rivet-mkhtml
             plot_file = os.path.join(outdir, f"{ANA}_{CHAN}_{groom}_pt{s}.plot")
+            plot_path = f"/{ANA}/{CHAN}_{groom}_pt{s}"
+            plot_template = f"""# BEGIN PLOT {plot_path}
+XMin=-4.5
+XMax=0.0
+# END PLOT
+"""
             with open(plot_file, "w") as f:
                 f.write(plot_template)
 
