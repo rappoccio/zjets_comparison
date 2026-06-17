@@ -1,56 +1,84 @@
-##################################################################
-# Herwig 7 — shower an EXISTING (aMC@NLO) Les Houches event file and analyse with
-# Rivet. Used by the amcnlo_herwig chain: MadGraph writes the parton-level LHE
-# (parton_shower=HERWIGPP counterterms), Herwig reads + showers + hadronises it.
-#
-# This is the analog of `pythia8-rivet  <cmnd with Beams:frameType=4>  out.yoda`
-# but for Herwig. No internal matrix element here — the hard events come from the
-# LHE, so we do NOT insert MEZJet.
-#
-# @LHE@ is substituted by gen_amcnlo_herwig_job.sh with the unzipped LHE path.
-##################################################################
+##################################################
+# Herwig 7 — shower MadGraph LO Z+jets LHE with Rivet
+# Based on LCG_107's LHE-MCatNLO.in, adapted for LO events
+# @LHE@ substituted by gen_mglo_herwig_job.sh
+##################################################
 read snippets/PPCollider.in
 
-##################################################################
-# Les Houches reader: read the MadGraph LHE. WeightOption VarNegWeight keeps the
-# MC@NLO negative weights (the YODA fill then carries the nominal weight).
-##################################################################
+##################################################
+# Technical parameters
+##################################################
+cd /Herwig/Generators
+set EventGenerator:DebugLevel 0
+set EventGenerator:PrintEvent 10
+set EventGenerator:MaxErrors 10000
+
+##################################################
+# Create the Les Houches file handler and reader
+##################################################
 cd /Herwig/EventHandlers
 library LesHouches.so
 create ThePEG::LesHouchesEventHandler LesHouchesHandler
-set LesHouchesHandler:WeightOption VarNegWeight
-set LesHouchesHandler:PartonExtractor      /Herwig/Partons/PPExtractor
-set LesHouchesHandler:CascadeHandler       /Herwig/Shower/ShowerHandler
+
+set LesHouchesHandler:PartonExtractor /Herwig/Partons/PPExtractor
+set LesHouchesHandler:CascadeHandler /Herwig/Shower/ShowerHandler
+set LesHouchesHandler:DecayHandler /Herwig/Decays/DecayHandler
 set LesHouchesHandler:HadronizationHandler /Herwig/Hadronization/ClusterHadHandler
-set LesHouchesHandler:DecayHandler         /Herwig/Decays/DecayHandler
+set LesHouchesHandler:WeightOption VarNegWeight
 
-create ThePEG::Cuts NoCuts
+set /Herwig/Generators/EventGenerator:EventHandler /Herwig/EventHandlers/LesHouchesHandler
 
+# Empty cuts object (LO generation already has cuts applied)
+create ThePEG::Cuts /Herwig/Cuts/NoCuts
+
+##################################################
+# PDF settings — use NNPDF31_nnlo_as_0118 (same as MadGraph generation)
+##################################################
+create ThePEG::LHAPDF /Herwig/Partons/LHAPDF ThePEGLHAPDF.so
+set /Herwig/Partons/LHAPDF:PDFName NNPDF31_nnlo_as_0118
+set /Herwig/Partons/RemnantDecayer:AllowTop Yes
+set /Herwig/Partons/LHAPDF:RemnantHandler /Herwig/Partons/HadronRemnants
+set /Herwig/Particles/p+:PDF /Herwig/Partons/LHAPDF
+set /Herwig/Particles/pbar-:PDF /Herwig/Partons/LHAPDF
+set /Herwig/Partons/PPExtractor:FirstPDF  /Herwig/Partons/LHAPDF
+set /Herwig/Partons/PPExtractor:SecondPDF /Herwig/Partons/LHAPDF
+
+##################################################
+# LHE reader
+##################################################
 create ThePEG::LesHouchesFileReader LesHouchesReader
 set LesHouchesReader:FileName @LHE@
 set LesHouchesReader:AllowedToReOpen No
 set LesHouchesReader:InitPDFs 0
-set LesHouchesReader:WeightWarnings false
+set LesHouchesReader:Cuts /Herwig/Cuts/NoCuts
 set LesHouchesReader:MomentumTreatment RescaleEnergy
-set LesHouchesReader:Cuts /Herwig/EventHandlers/NoCuts
-set LesHouchesReader:PartonExtractor /Herwig/Partons/PPExtractor
-set LesHouchesReader:PDFA /Herwig/Partons/HardLOPDF
-set LesHouchesReader:PDFB /Herwig/Partons/HardLOPDF
+set LesHouchesReader:PDFA /Herwig/Partons/LHAPDF
+set LesHouchesReader:PDFB /Herwig/Partons/LHAPDF
 insert LesHouchesHandler:LesHouchesReaders 0 LesHouchesReader
 
-cd /Herwig/Generators
-set EventGenerator:EventHandler /Herwig/EventHandlers/LesHouchesHandler
+##################################################
+# Shower parameters
+##################################################
+set /Herwig/Shower/ShowerHandler:MaxPtIsMuF Yes
+set /Herwig/Shower/ShowerHandler:RestrictPhasespace Yes
+set /Herwig/Shower/PartnerFinder:PartnerMethod Random
+set /Herwig/Shower/PartnerFinder:ScaleChoice Partner
+set /Herwig/Shower/KinematicsReconstructor:InitialInitialBoostOption LongTransBoost
+set /Herwig/Shower/KinematicsReconstructor:ReconstructionOption General
+set /Herwig/Shower/KinematicsReconstructor:InitialStateReconOption Rapidity
+set /Herwig/Shower/ShowerHandler:SpinCorrelations No
 
-##################################################################
-# Rivet hook -> our analysis (identical to zjets.in).
-##################################################################
+##################################################
+# Rivet analysis
+##################################################
 cd /Herwig/Analysis
 create ThePEG::RivetAnalysis Rivet RivetAnalysis.so
 insert Rivet:Analyses 0 CMS_2026_PAS_SMP_25_010
 cd /Herwig/Generators
 insert EventGenerator:AnalysisHandlers 0 /Herwig/Analysis/Rivet
 
-##################################################################
-# Build the run (events + seed are given on the `Herwig run` command line).
-##################################################################
+##################################################
+# Save run
+##################################################
+cd /Herwig/Generators
 saverun zjets_hw EventGenerator
