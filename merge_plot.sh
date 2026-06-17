@@ -27,8 +27,15 @@ cd out
 mkargs=()
 for f in mc_*.yoda; do t="${f#mc_}"; t="${t%.yoda}"; mkargs+=("$f:$t"); done
 mkargs+=("ref.yoda:CMS data")
-# Use a node-local matplotlib cache to avoid parallel font/tex cache races
-# (shared cache on EOS/AFS produces truncated PNGs).
-export MPLCONFIGDIR="${TMPDIR:-/tmp}/mpl-$$"; mkdir -p "$MPLCONFIGDIR"
+# Isolate matplotlib caches and disable problematic font config caching
+export MPLCONFIGDIR="${TMPDIR:-/tmp}/mpl-$$"
+export FONTCONFIG_PATH="/tmp/fc-$$"
+export MPLBACKEND=Agg
+mkdir -p "$MPLCONFIGDIR" "$FONTCONFIG_PATH"
 rivet-mkhtml -o ../html "${mkargs[@]}"
+
+# Post-process generated plot scripts to disable LaTeX rendering
+for py in ../html/CMS_2026_PAS_SMP_25_010/*.py; do
+  sed -i "s/^import matplotlib/import matplotlib\nmpl.rcParams['text.usetex'] = False/" "$py"
+done
 echo ">>> plots: $PKG/html/index.html"
