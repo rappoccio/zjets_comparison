@@ -24,5 +24,7 @@ echo ">>> build_comparison.py: ${specs[*]%%=*}"
 python3 build_comparison.py "$PKG" out "${specs[@]}"
 
 cd out
-rivet-mkhtml -o ../html *.yoda
+# -c axis.plot applies the XMin/XMax (-4.5..0) ranges; rivet-mkhtml will not
+# pick up plot-config files automatically just because they sit next to the YODAs.
+rivet-mkhtml -o ../html -c axis.plot *.yoda
 echo ">>> plots: $PKG/html/index.html"

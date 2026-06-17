@@ -133,19 +133,23 @@ def build_mc(paths, title):
 
 
 def write_plot_files(outdir):
-    """Write .plot files to control x-axis range for all histograms."""
+    """Write a single Rivet plot-config file controlling the x-axis range for
+    every histogram. rivet-mkhtml does NOT auto-discover .plot files sitting
+    next to the YODAs, so this file must be passed explicitly via `-c`
+    (see merge_plot.sh). Without it the plots default to the full data range
+    (-10..0) instead of the -4.5..0 region we care about."""
+    blocks = []
     for groom in GROOMS:
         for s in range(NSLICE):
-            # .plot files go in the same directory as the YODA files for rivet-mkhtml
-            plot_file = os.path.join(outdir, f"{ANA}_{CHAN}_{groom}_pt{s}.plot")
-            plot_path = f"/{ANA}/{CHAN}_{groom}_pt{s}"
-            plot_template = f"""# BEGIN PLOT {plot_path}
+            blocks.append(f"""# BEGIN PLOT /{ANA}/{CHAN}_{groom}_pt{s}
 XMin=-4.5
 XMax=0.0
 # END PLOT
-"""
-            with open(plot_file, "w") as f:
-                f.write(plot_template)
+""")
+    plot_file = os.path.join(outdir, "axis.plot")
+    with open(plot_file, "w") as f:
+        f.write("\n".join(blocks))
+    print(f"wrote {plot_file} (pass to rivet-mkhtml with -c)")
 
 
 def main():
