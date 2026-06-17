@@ -2,10 +2,12 @@
 # substituted per job by gen_amcnlo_herwig_job.sh.
 #
 # Difference from zjets_batch.mg5 (the Pythia8 variant):
-#   * shower = OFF  -> the LCG MadGraph build has no runnable shower interface,
-#     so we only write the parton-level NLO LHE and shower it externally with
-#     Herwig7 (herwig/lhe_shower_nlo.in). NLO counterterms are generic, suitable
-#     for any shower.
+#   * parton_shower = HERWIGPP  -> compute MC@NLO counterterms for Herwig7's
+#     angular-ordered shower. These are baked into the LHE file.
+#   * shower = OFF  -> the LCG MadGraph build has no runnable shower, so we
+#     write unshowered NLO LHE and apply Herwig7 shower externally
+#     (herwig/lhe_shower_nlo.in). The warning is expected: we ARE showering,
+#     just outside MadGraph.
 #   * no pythia8_card block (Pythia-specific; irrelevant here).
 import model sm
 define j = g u c d s b u~ c~ d~ s~ b~
@@ -21,13 +23,13 @@ set ebeam1       6500
 set ebeam2       6500
 set pdlabel      lhapdf
 set lhaid        325300        # NNPDF31_nnlo_as_0118
+set parton_shower HERWIGPP     # MC@NLO counterterms for Herwig7
 set ptj          150           # recoil-jet generation cut
 set ptl          15
 set mll          50
 set nevents      @NEV@
 set iseed        @SEED@         # distinct random seed per job
 set use_syst     False
-# NLO counterterms are generic (not shower-specific) since shower=OFF
 # --- MadSpin: Z -> charged leptons (e/mu) ---
 set spinmode     none
 decay z > l+ l-
