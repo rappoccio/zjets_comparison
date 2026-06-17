@@ -34,7 +34,6 @@ insert LesHouchesHandler:LesHouchesReaders 0 LesHouchesReader
 
 cd /Herwig/Generators
 set EventGenerator:EventHandler /Herwig/EventHandlers/LesHouchesHandler
-set EventGenerator:EventHandler:LuminosityFunction:Energy 13000.0
 
 ##################################################################
 # Rivet hook -> our analysis (identical to zjets.in).
