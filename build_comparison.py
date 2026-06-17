@@ -38,9 +38,6 @@ def _scatter(path, value, eup, edn, title=None):
         p.setXErrs(xm - xlo, xhi - xm)
         p.setYErrs(float(edn[j]), float(eup[j]))
         s.addPoint(p)
-    # Set x-axis range to start at -4.5
-    s.setXMin(-4.5)
-    s.setXMax(0.0)
     return s
 
 
@@ -135,6 +132,19 @@ def build_mc(paths, title):
     return aos
 
 
+def write_plot_files(outdir):
+    """Write .plot files to control x-axis range for all histograms."""
+    plot_template = """XMin=-4.5
+XMax=0.0
+"""
+    for groom in GROOMS:
+        for s in range(NSLICE):
+            plot_file = os.path.join(outdir, f"{ANA}", f"{CHAN}_{groom}_pt{s}.plot")
+            os.makedirs(os.path.dirname(plot_file), exist_ok=True)
+            with open(plot_file, "w") as f:
+                f.write(plot_template)
+
+
 def main():
     repo, outdir = sys.argv[1], sys.argv[2]
     preds, also_tp = [], False
@@ -157,6 +167,9 @@ def main():
         out = os.path.join(outdir, f"mc_{name}.yoda")
         yoda.write(aos, out)
         print(f"wrote {out} ({len(aos)} objects) from {len(paths)} file(s)")
+
+    # Write .plot files to control x-axis range (Rivet standard method)
+    write_plot_files(outdir)
 
 
 if __name__ == "__main__":
