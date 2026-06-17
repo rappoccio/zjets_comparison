@@ -1,14 +1,15 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
-# This Python script was auto-generated using YODA v2.0.2.
+# This Python script was auto-generated using YODA v2.1.3.
 # Analysis object: /CMS_2026_PAS_SMP_25_010/zjets_ungroomed_pt2
-# Timestamp: 17-06-2026 (18:26:08)
+# Timestamp: 17-06-2026 (16:37:38)
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 mpl.use('Agg') # comment out for interactive use
 import os
 import numpy as np
+from numpy import nan, inf
 
 plotDir = os.path.split(os.path.realpath(__file__))[0]
 if 'YODA_USER_PLOT_PATH' in globals():
@@ -20,17 +21,17 @@ else:
 plt.style.use(os.path.join(plotDir, '../default.mplstyle'))
 # plot metadata
 figW, figH = plt.rcParams['figure.figsize']
-ax_xLabel = r''
-ax_yLabel = r''
-ax_title  = r''
+ax_xLabel = ''
+ax_yLabel = ''
+ax_title  = ''
 ax_xScale = 'linear'
-ax_yScale = 'log'
+ax_yScale = 'linear'
 xLims = (-4.5, 0.0)
-yLims = (9.000000000000001e-09, 1.1)
+yLims = (-0.00097384353, 0.96537826)
 
 # TeX-friendly labels for the legend
 labels = {
-    'legend' : ([ r"Data", r"mc\_amcnlo", r"mc\_herwig", r"mc\_mglo\_pythia", r"mc\_mglo\_vincia", r"mc\_pythia8", r"mc\_vincia" ], r""),
+  'legend' : ([ r"Data", r"mc\_amcnlo", r"mc\_herwig", r"mc\_mglo\_pythia", r"mc\_mglo\_vincia", r"mc\_pythia8", r"mc\_vincia" ], r""),
 }
 
 # Adjust canvas width and height
@@ -50,7 +51,7 @@ plt.subplots_adjust(
     top    = 1.0 * plt.rcParams['figure.subplot.top'],
     bottom = 1.0 * plt.rcParams['figure.subplot.bottom'])
 
-ratio0_ax.yaxis.set_major_locator(mpl.ticker.MultipleLocator(0.1))
+ratio0_ax.yaxis.set_major_locator(mpl.ticker.MultipleLocator(0.2))
 ratio0_ax.set_ylim(0.5, 1.4999)
 ratio0_ax.set_ylabel('MC/Data')
 
@@ -69,6 +70,7 @@ styles = {
   'Data': {
     'color' : 'black',
     'linestyle' : '-',
+    'lineopacity' : 1.0,
     'linewidth' : 1,
     'marker' : 'o',
     'markersize' : 2,
@@ -81,6 +83,7 @@ styles = {
     'fillcolor' : None,
     'fillopacity' : 1.0,
     'ratio0_linestyle' : '-',
+    'ratio0_lineopacity' : 1.0,
     'ratio0_linewidth' : 1,
     'ratio0_marker' : 'o',
     'ratio0_markersize' : 2,
@@ -94,6 +97,7 @@ styles = {
   'mc_amcnlo.yoda': {
     'color' : '#EE3311',
     'linestyle' : '-',
+    'lineopacity' : 1.0,
     'linewidth' : 1,
     'marker' : 'none',
     'markersize' : 2,
@@ -106,6 +110,7 @@ styles = {
     'fillcolor' : None,
     'fillopacity' : 1.0,
     'ratio0_linestyle' : '-',
+    'ratio0_lineopacity' : 1.0,
     'ratio0_linewidth' : 1,
     'ratio0_marker' : 'none',
     'ratio0_markersize' : 2,
@@ -119,6 +124,7 @@ styles = {
   'mc_herwig.yoda': {
     'color' : '#3366FF',
     'linestyle' : '-',
+    'lineopacity' : 1.0,
     'linewidth' : 1,
     'marker' : 'none',
     'markersize' : 2,
@@ -131,6 +137,7 @@ styles = {
     'fillcolor' : None,
     'fillopacity' : 1.0,
     'ratio0_linestyle' : '-',
+    'ratio0_lineopacity' : 1.0,
     'ratio0_linewidth' : 1,
     'ratio0_marker' : 'none',
     'ratio0_markersize' : 2,
@@ -144,6 +151,7 @@ styles = {
   'mc_mglo_pythia.yoda': {
     'color' : '#109618',
     'linestyle' : '-',
+    'lineopacity' : 1.0,
     'linewidth' : 1,
     'marker' : 'none',
     'markersize' : 2,
@@ -156,6 +164,7 @@ styles = {
     'fillcolor' : None,
     'fillopacity' : 1.0,
     'ratio0_linestyle' : '-',
+    'ratio0_lineopacity' : 1.0,
     'ratio0_linewidth' : 1,
     'ratio0_marker' : 'none',
     'ratio0_markersize' : 2,
@@ -169,6 +178,7 @@ styles = {
   'mc_mglo_vincia.yoda': {
     'color' : '#FF9900',
     'linestyle' : '-',
+    'lineopacity' : 1.0,
     'linewidth' : 1,
     'marker' : 'none',
     'markersize' : 2,
@@ -181,6 +191,7 @@ styles = {
     'fillcolor' : None,
     'fillopacity' : 1.0,
     'ratio0_linestyle' : '-',
+    'ratio0_lineopacity' : 1.0,
     'ratio0_linewidth' : 1,
     'ratio0_marker' : 'none',
     'ratio0_markersize' : 2,
@@ -194,6 +205,7 @@ styles = {
   'mc_pythia8.yoda': {
     'color' : '#990099',
     'linestyle' : '-',
+    'lineopacity' : 1.0,
     'linewidth' : 1,
     'marker' : 'none',
     'markersize' : 2,
@@ -206,6 +218,7 @@ styles = {
     'fillcolor' : None,
     'fillopacity' : 1.0,
     'ratio0_linestyle' : '-',
+    'ratio0_lineopacity' : 1.0,
     'ratio0_linewidth' : 1,
     'ratio0_marker' : 'none',
     'ratio0_markersize' : 2,
@@ -219,6 +232,7 @@ styles = {
   'mc_vincia.yoda': {
     'color' : '#EE3311',
     'linestyle' : '-',
+    'lineopacity' : 1.0,
     'linewidth' : 1,
     'marker' : 'none',
     'markersize' : 2,
@@ -231,6 +245,7 @@ styles = {
     'fillcolor' : None,
     'fillopacity' : 1.0,
     'ratio0_linestyle' : '-',
+    'ratio0_lineopacity' : 1.0,
     'ratio0_linewidth' : 1,
     'ratio0_marker' : 'none',
     'ratio0_markersize' : 2,
@@ -258,6 +273,7 @@ for label, yvals in dataf['yvals'].items():
         tmp, = ax.plot(xpos, ypos,
                        color=styles[label]['color'],
                        linestyle=styles[label]['linestyle'],
+                       alpha=styles[label]['lineopacity'],
                        linewidth=styles[label]['linewidth'],
                        drawstyle=styles[label]['drawstyle'], solid_joinstyle='miter',
                        zorder=styles[label]['zorder'], label=label)
@@ -265,6 +281,7 @@ for label, yvals in dataf['yvals'].items():
                       xerr=np.array(dataf['xerrs'][label])*styles[label]['xerrorbars'],
                       yerr=np.array(dataf['yerrs'][label])*styles[label]['yerrorbars'],
                       fmt=styles[label]['marker'], capsize=styles[label]['capsize'],
+                      alpha=styles[label]['lineopacity'],
                       markersize=styles[label]['markersize'],
                       ecolor=styles[label]['color'],
                       color=styles[label]['color'], zorder=styles[label]['zorder'])
@@ -293,12 +310,14 @@ for label, yvals in dataf['ratio0_yvals'].items():
                        color=styles[label]['color'],
                        linewidth=styles[label]['linewidth'],
                        linestyle=styles[label]['ratio0_linestyle'],
+                       alpha=styles[label]['ratio0_lineopacity'],
                        drawstyle=styles[label]['ratio0_drawstyle'], zorder=styles[label]['zorder'],
                        solid_joinstyle='miter')
     tmp = ratio0_ax.errorbar(dataf['xpoints']['Data'], yvals,
                              xerr=np.array(dataf['ref_xerrs'])*styles[label]['ratio0_xerrorbars'],
                              yerr=np.array(dataf['ratio0_yerrs'][label])*styles[label]['ratio0_yerrorbars'],
                              fmt=styles[label]['ratio0_marker'], capsize=styles[label]['ratio0_capsize'],
+                             alpha=styles[label]['ratio0_lineopacity'],
                              markersize=styles[label]['ratio0_markersize'],
                              ecolor=styles[label]['color'],
                              color=styles[label]['color'])
@@ -331,15 +350,13 @@ ax.yaxis.set_label_coords(-0.11, 1.0)
 ax.set_title(ax_title, loc='left')
 ax.set_xscale(ax_xScale)
 ax.set_yscale(ax_yScale)
+ratio0_ax.set_yscale('linear')
 ax.set_xlim(xLims)
 ax.set_ylim(yLims)
 
 # tick formatting
 plt.rcParams['xtick.top'] = True
 plt.rcParams['ytick.right'] = True
-ax.yaxis.set_major_locator(mpl.ticker.LogLocator(base=10.0, numticks=np.inf))
-ax.yaxis.set_minor_locator(mpl.ticker.LogLocator(
-                           base=10.0, subs=np.arange(0.1, 1, 0.1), numticks=np.inf))
 fig.align_ylabels((ax, ratio0_ax))
 plt.savefig(os.path.join(plot_outdir, 'zjets_ungroomed_pt2.pdf'), format='PDF')
 plt.savefig(os.path.join(plot_outdir, 'zjets_ungroomed_pt2.png'), format='PNG')
