@@ -16,7 +16,7 @@ read snippets/PPCollider.in
 # MC@NLO negative weights (the YODA fill then carries the nominal weight).
 ##################################################################
 cd /Herwig/EventHandlers
-create ThePEG::LesHouchesFileReader LHEReader
+create Herwig::LesHouchesFileReader LHEReader
 set LHEReader:FileName @LHE@
 set LHEReader:WeightWarnings false
 set LHEReader:AllowedToReOpen No
