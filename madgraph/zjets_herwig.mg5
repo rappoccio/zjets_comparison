@@ -2,7 +2,7 @@
 # substituted per job by gen_amcnlo_herwig_job.sh.
 #
 # Difference from zjets_batch.mg5 (the Pythia8 variant):
-#   * parton_shower = HERWIGPP  -> compute MC@NLO counterterms for Herwig7's
+#   * parton_shower = HERWIG7  -> compute MC@NLO counterterms for Herwig7's
 #     angular-ordered shower. These are baked into the LHE file.
 #   * shower = OFF  -> the LCG MadGraph build has no runnable shower, so we
 #     write unshowered NLO LHE and apply Herwig7 shower externally
@@ -23,7 +23,9 @@ set ebeam1       6500
 set ebeam2       6500
 set pdlabel      lhapdf
 set lhaid        325300        # NNPDF31_nnlo_as_0118
-set parton_shower HERWIGPP     # MC@NLO counterterms for Herwig7
+# parton_shower selects which shower the MC@NLO counterterms target; it is baked
+# into the LHE. Must be HERWIG7 (NOT HERWIGPP/HERWIG6) to match Herwig 7 showering.
+set parton_shower HERWIG7
 set ptj          150           # recoil-jet generation cut
 set ptl          15
 set mll          50
