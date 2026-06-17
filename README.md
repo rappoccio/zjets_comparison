@@ -17,7 +17,8 @@ vi config.sh          # set LCG_VIEW (Rivet >= 4.0); tune NEV/NSEEDS if you like
 ./submit_amcnlo.sh
 condor_q              #   ...watch them finish...
 
-./merge_plot.sh       # auto-discovers yodas/* and plots them all -> html/index.html
+./merge_plot.sh       # auto-discovers yodas/* and merges them -> out/*.yoda
+rivet-mkhtml -o html -c out/axis.plot out/*.yoda  # generate HTML plots
 ```
 
 There is **one submit script per generator** — run any subset, in any order, even
@@ -43,8 +44,9 @@ gen_*_job.sh          per-generator HTCondor payloads (one seed each):
                         gen_amcnlo_herwig_job.sh, gen_mglo_job.sh (pythia/vincia),
                         gen_mglo_herwig_job.sh, gen_powheg_job.sh, gen_sherpa_job.sh
 
-merge_plot.sh         sum every yodas/<gen>/ -> build_comparison.py -> rivet-mkhtml
+merge_plot.sh         sum every yodas/<gen>/ -> build_comparison.py
 build_comparison.py   slice each 2D prediction to per-slice unit-area 1D + /REF from npz
+axis.plot             rivet-mkhtml configuration (axis ranges, log scale, legend position)
 
 CMS_2026_PAS_SMP_25_010.cc      the Rivet analysis (2D, HepData binning)
 hepdata_export_{groomed,ungroomed}.npz   the data

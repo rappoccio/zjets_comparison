@@ -2,7 +2,7 @@
 
 # This Python script was auto-generated using YODA v2.1.3.
 # Analysis object: /CMS_2026_PAS_SMP_25_010/zjets_groomed_pt0
-# Timestamp: 17-06-2026 (16:37:38)
+# Timestamp: 17-06-2026 (16:43:15)
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -27,7 +27,7 @@ ax_title  = ''
 ax_xScale = 'linear'
 ax_yScale = 'linear'
 xLims = (-4.5, 0.0)
-yLims = (0.0, 0.44283932)
+yLims = (0.0, 0.8)
 
 # TeX-friendly labels for the legend
 labels = {
@@ -339,8 +339,8 @@ ax.add_artist(ax.legend(legend_items,
                         labels['legend'][0],
                         title=labels['legend'][1],
                         alignment='left',
-                        loc='upper left',
-                        bbox_to_anchor=(0.0, 0.97)))
+                        loc='upper center',
+                        bbox_to_anchor=(0.5, 0.97)))
 
 # set plot metadata as defined above
 ratio0_ax.set_xlabel(ax_xLabel)

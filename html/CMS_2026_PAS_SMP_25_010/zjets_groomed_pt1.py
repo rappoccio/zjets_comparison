@@ -2,7 +2,7 @@
 
 # This Python script was auto-generated using YODA v2.1.3.
 # Analysis object: /CMS_2026_PAS_SMP_25_010/zjets_groomed_pt1
-# Timestamp: 17-06-2026 (16:37:38)
+# Timestamp: 17-06-2026 (16:43:15)
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -27,7 +27,7 @@ ax_title  = ''
 ax_xScale = 'linear'
 ax_yScale = 'linear'
 xLims = (-4.5, 0.0)
-yLims = (0.0, 0.43983148000000005)
+yLims = (0.0, 0.8)
 
 # TeX-friendly labels for the legend
 labels = {

@@ -24,18 +24,21 @@ LogY=0
 XMin=-4.5
 XMax=0.0
 LogY=0
+YMax=0.8
 # END PLOT
 
 # BEGIN PLOT /CMS_2026_PAS_SMP_25_010/zjets_groomed_pt1
 XMin=-4.5
 XMax=0.0
 LogY=0
+YMax=0.8
 # END PLOT
 
 # BEGIN PLOT /CMS_2026_PAS_SMP_25_010/zjets_groomed_pt2
 XMin=-4.5
 XMax=0.0
 LogY=0
+YMax=0.8
 # END PLOT
 
 # Dijet ungroomed
@@ -62,18 +65,21 @@ LogY=0
 XMin=-4.5
 XMax=0.0
 LogY=0
+YMax=0.8
 # END PLOT
 
 # BEGIN PLOT /CMS_2026_PAS_SMP_25_010/dijet_groomed_pt1
 XMin=-4.5
 XMax=0.0
 LogY=0
+YMax=0.8
 # END PLOT
 
 # BEGIN PLOT /CMS_2026_PAS_SMP_25_010/dijet_groomed_pt2
 XMin=-4.5
 XMax=0.0
 LogY=0
+YMax=0.8
 # END PLOT
 
 # Trijet ungroomed
@@ -100,16 +106,19 @@ LogY=0
 XMin=-4.5
 XMax=0.0
 LogY=0
+YMax=0.8
 # END PLOT
 
 # BEGIN PLOT /CMS_2026_PAS_SMP_25_010/trijet_groomed_pt1
 XMin=-4.5
 XMax=0.0
 LogY=0
+YMax=0.8
 # END PLOT
 
 # BEGIN PLOT /CMS_2026_PAS_SMP_25_010/trijet_groomed_pt2
 XMin=-4.5
 XMax=0.0
 LogY=0
+YMax=0.8
 # END PLOT
