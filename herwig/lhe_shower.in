@@ -16,28 +16,24 @@ read snippets/PPCollider.in
 # MC@NLO negative weights (the YODA fill then carries the nominal weight).
 ##################################################################
 cd /Herwig/EventHandlers
-set LesHouchesFileReader:FileName @LHE@
-set LesHouchesFileReader:WeightWarnings false
-set LesHouchesFileReader:AllowedToReOpen No
-set LesHouchesFileReader:InitPDFs 0
-set LesHouchesFileReader:CacheFileName .lhecache
-set LesHouchesFileReader:MaxScan 5
+library LesHouches.so
+create ThePEG::LesHouchesEventHandler LesHouchesHandler
+set LesHouchesHandler:WeightOption VarNegWeight
+set LesHouchesHandler:PartonExtractor      /Herwig/Partons/PPExtractor
+set LesHouchesHandler:CascadeHandler       /Herwig/Shower/ShowerHandler
+set LesHouchesHandler:HadronizationHandler /Herwig/Hadronization/ClusterHadHandler
+set LesHouchesHandler:DecayHandler         /Herwig/Decays/DecayHandler
 
-# Beams / PDF: take the proton-proton extractor + PDFs from the PPCollider snippet.
-set LesHouchesFileReader:PartonExtractor /Herwig/Partons/PPExtractor
-set LesHouchesFileReader:PDFA /Herwig/Partons/HardLOPDF
-set LesHouchesFileReader:PDFB /Herwig/Partons/HardLOPDF
-
-set LesHouchesEventHandler:WeightOption VarNegWeight
-do LesHouchesEventHandler:LesHouchesReaders clear
-insert LesHouchesEventHandler:LesHouchesReaders 0 LesHouchesFileReader
-set LesHouchesEventHandler:PartonExtractor      /Herwig/Partons/PPExtractor
-set LesHouchesEventHandler:CascadeHandler       /Herwig/Shower/ShowerHandler
-set LesHouchesEventHandler:HadronizationHandler /Herwig/Hadronization/ClusterHadHandler
-set LesHouchesEventHandler:DecayHandler         /Herwig/Decays/DecayHandler
+create ThePEG::LesHouchesFileReader LesHouchesReader
+set LesHouchesReader:FileName @LHE@
+set LesHouchesReader:AllowedToReOpen No
+set LesHouchesReader:InitPDFs 0
+set LesHouchesReader:PDFA /Herwig/Partons/HardLOPDF
+set LesHouchesReader:PDFB /Herwig/Partons/HardLOPDF
+insert LesHouchesHandler:LesHouchesReaders 0 LesHouchesReader
 
 cd /Herwig/Generators
-set EventGenerator:EventHandler /Herwig/EventHandlers/LesHouchesEventHandler
+set EventGenerator:EventHandler /Herwig/EventHandlers/LesHouchesHandler
 set EventGenerator:EventHandler:LuminosityFunction:Energy 13000.0
 
 ##################################################################
