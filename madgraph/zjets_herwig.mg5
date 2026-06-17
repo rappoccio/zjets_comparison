@@ -2,12 +2,17 @@
 # substituted per job by gen_amcnlo_herwig_job.sh.
 #
 # Difference from zjets_batch.mg5 (the Pythia8 variant):
-#   * parton_shower = HERWIG7  -> compute MC@NLO counterterms for Herwig7's
-#     angular-ordered shower. These are baked into the LHE file.
-#   * shower = OFF  -> the LCG MadGraph build has no runnable shower, so we
-#     write unshowered NLO LHE and apply Herwig7 shower externally
-#     (herwig/lhe_shower_nlo.in). The warning is expected: we ARE showering,
-#     just outside MadGraph.
+#   * shower = HERWIGPP  -> this build's name for the Herwig 7 / Herwig++ shower
+#     (valid values are HERWIG6, HERWIGPP, PYTHIA6Q, PYTHIA6PT, PYTHIA8; there is
+#     NO "HERWIG7" token, and HERWIG6 is the old Fortran shower — do not use it).
+#     The shower switch is what sets parton_shower=HERWIGPP in the run_card;
+#     parton_shower is SLAVED to it, so with shower=OFF a bare 'set parton_shower'
+#     is ignored and it stays at the default HERWIG6. The HERWIGPP counterterms for
+#     the angular-ordered shower are baked into the LHE. The LCG MadGraph build has
+#     no runnable Herwig interface, so the shower step itself no-ops (exactly like
+#     shower=Pythia8 in zjets_batch.mg5) — we write the unshowered NLO LHE and apply
+#     the Herwig 7 shower externally (herwig/lhe_shower_nlo.in). The "shower not
+#     available" warning is expected.
 #   * no pythia8_card block (Pythia-specific; irrelevant here).
 import model sm
 define j = g u c d s b u~ c~ d~ s~ b~
@@ -15,7 +20,7 @@ generate p p > z j [QCD]
 output zjets_nlo_hw -f
 
 launch zjets_nlo_hw
-shower=OFF
+shower=HERWIGPP
 madspin=ON
 reweight=OFF
 # --- run_card (NLO) ---
@@ -23,9 +28,7 @@ set ebeam1       6500
 set ebeam2       6500
 set pdlabel      lhapdf
 set lhaid        325300        # NNPDF31_nnlo_as_0118
-# parton_shower selects which shower the MC@NLO counterterms target; it is baked
-# into the LHE. Must be HERWIG7 (NOT HERWIGPP/HERWIG6) to match Herwig 7 showering.
-set parton_shower HERWIG7
+# NB: parton_shower is set to HERWIGPP by the 'shower=HERWIGPP' switch above, NOT here.
 set ptj          150           # recoil-jet generation cut
 set ptl          15
 set mll          50
