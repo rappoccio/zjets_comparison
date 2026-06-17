@@ -30,7 +30,9 @@ create ThePEG::LesHouchesFileReader LesHouchesReader
 set LesHouchesReader:FileName @LHE@
 set LesHouchesReader:AllowedToReOpen No
 set LesHouchesReader:InitPDFs 0
+set LesHouchesReader:WeightWarnings false
 set LesHouchesReader:Cuts /Herwig/EventHandlers/NoCuts
+set LesHouchesReader:PartonExtractor /Herwig/Partons/PPExtractor
 set LesHouchesReader:PDFA /Herwig/Partons/HardLOPDF
 set LesHouchesReader:PDFB /Herwig/Partons/HardLOPDF
 insert LesHouchesHandler:LesHouchesReaders 0 LesHouchesReader
