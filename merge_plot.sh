@@ -12,7 +12,7 @@ specs=()
 for d in "$PKG"/yodas/*/; do
   [ -d "$d" ] || continue
   name=$(basename "$d")
-  files=$(ls "$d"*.yoda 2>/dev/null | paste -sd, -)
+  files=$(ls "$d"*.yoda 2>/dev/null | paste -sd, -) || true
   [ -n "$files" ] || continue
   echo "  $name: $(ls "$d"*.yoda 2>/dev/null | wc -l) file(s)"
   specs+=( "${name}=${files}" )
