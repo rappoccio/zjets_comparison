@@ -27,5 +27,9 @@ cd out
 mkargs=()
 for f in mc_*.yoda; do t="${f#mc_}"; t="${t%.yoda}"; mkargs+=("$f:$t"); done
 mkargs+=("ref.yoda:CMS data")
-rivet-mkhtml -o ../html "${mkargs[@]}"
+# Render single-threaded with a node-local matplotlib cache: rivet-mkhtml's
+# parallel workers otherwise race on a shared font/tex cache (worse on EOS/AFS),
+# producing truncated PNGs ("not a PNG file").
+export MPLCONFIGDIR="${TMPDIR:-/tmp}/mpl-$$"; mkdir -p "$MPLCONFIGDIR"
+rivet-mkhtml -n 1 -o ../html "${mkargs[@]}"
 echo ">>> plots: $PKG/html/index.html"
