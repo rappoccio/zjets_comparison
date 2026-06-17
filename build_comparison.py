@@ -139,8 +139,8 @@ XMax=0.0
 """
     for groom in GROOMS:
         for s in range(NSLICE):
-            plot_file = os.path.join(outdir, f"{ANA}", f"{CHAN}_{groom}_pt{s}.plot")
-            os.makedirs(os.path.dirname(plot_file), exist_ok=True)
+            # .plot files go in the same directory as the YODA files for rivet-mkhtml
+            plot_file = os.path.join(outdir, f"{ANA}_{CHAN}_{groom}_pt{s}.plot")
             with open(plot_file, "w") as f:
                 f.write(plot_template)
 
