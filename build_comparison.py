@@ -134,8 +134,10 @@ def build_mc(paths, title):
 
 def write_plot_files(outdir):
     """Write .plot files to control x-axis range for all histograms."""
-    plot_template = """XMin=-4.5
+    plot_template = """# BEGIN PLOT
+XMin=-4.5
 XMax=0.0
+# END PLOT
 """
     for groom in GROOMS:
         for s in range(NSLICE):
