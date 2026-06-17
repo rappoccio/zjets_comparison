@@ -4,8 +4,8 @@
 # aMC@NLO computes shower-specific MC@NLO counterterms, so the shower MUST match
 # the one the LHE was generated for. Here madgraph/zjets_herwig.mg5 sets
 # parton_shower=HERWIGPP, and we shower the resulting LHE with Herwig7's
-# LesHouchesFileReader (herwig/lhe_shower.in) — the valid Herwig analog of the
-# Pythia8 chain in gen_amcnlo_job.sh.
+# LesHouchesFileReader (herwig/lhe_shower_nlo.in) — configured for NLO MC@NLO
+# events with IDWTUP=-4 and negative weights.
 #
 # Args:  SEED  NEV  PKG  LCG_VIEW  OUTDIR  [EOS_XROOTD]
 set -euo pipefail
@@ -37,7 +37,7 @@ echo ">>> showering LHE with Herwig7: $LHE"
 
 # 2. Herwig setup. Same relocated-LCG fixes as gen_herwig_job.sh: find the real
 #    read root (snippets/PPCollider.in) + the compiled-in HerwigDefaults.rpo.
-cp "$PKG/herwig/lhe_shower.in" .
+cp "$PKG/herwig/lhe_shower_nlo.in" lhe_shower.in
 sed -i "s#@LHE@#$LHE#g" lhe_shower.in
 
 HWROOT=$(readlink -f "$(dirname "$(command -v Herwig)")/.." 2>/dev/null || true)

@@ -1,0 +1,86 @@
+##################################################
+# Herwig 7 — shower aMC@NLO NLO Z+jets LHE with Rivet
+# For MC@NLO events (IDWTUP=-4) with negative weights
+# @LHE@ substituted by gen_amcnlo_herwig_job.sh
+##################################################
+read snippets/PPCollider.in
+
+##################################################
+# Technical parameters
+##################################################
+cd /Herwig/Generators
+set EventGenerator:DebugLevel 0
+set EventGenerator:PrintEvent 10
+set EventGenerator:MaxErrors 10000
+set EventGenerator:NumberOfEvents @NEV@
+
+##################################################
+# Create the Les Houches file handler and reader
+##################################################
+cd /Herwig/EventHandlers
+library LesHouches.so
+create ThePEG::LesHouchesEventHandler LesHouchesHandler
+
+set LesHouchesHandler:PartonExtractor /Herwig/Partons/PPExtractor
+set LesHouchesHandler:CascadeHandler /Herwig/Shower/ShowerHandler
+set LesHouchesHandler:DecayHandler /Herwig/Decays/DecayHandler
+set LesHouchesHandler:HadronizationHandler /Herwig/Hadronization/ClusterHadHandler
+set LesHouchesHandler:WeightOption VarNegWeight
+
+set /Herwig/Generators/EventGenerator:EventHandler /Herwig/EventHandlers/LesHouchesHandler
+
+# Empty cuts object (NLO generation already has cuts applied)
+create ThePEG::Cuts /Herwig/Cuts/NoCuts
+
+##################################################
+# PDF settings — use NNPDF31_nnlo_as_0118 (same as MadGraph generation)
+##################################################
+create ThePEG::LHAPDF /Herwig/Partons/LHAPDF ThePEGLHAPDF.so
+set /Herwig/Partons/LHAPDF:PDFName NNPDF31_nnlo_as_0118
+set /Herwig/Partons/RemnantDecayer:AllowTop Yes
+set /Herwig/Partons/LHAPDF:RemnantHandler /Herwig/Partons/HadronRemnants
+set /Herwig/Particles/p+:PDF /Herwig/Partons/LHAPDF
+set /Herwig/Particles/pbar-:PDF /Herwig/Partons/LHAPDF
+set /Herwig/Partons/PPExtractor:FirstPDF  /Herwig/Partons/LHAPDF
+set /Herwig/Partons/PPExtractor:SecondPDF /Herwig/Partons/LHAPDF
+
+##################################################
+# LHE reader for MC@NLO events
+##################################################
+create ThePEG::LesHouchesFileReader LesHouchesReader
+set LesHouchesReader:FileName @LHE@
+set LesHouchesReader:AllowedToReOpen No
+set LesHouchesReader:InitPDFs 0
+set LesHouchesReader:Cuts /Herwig/Cuts/NoCuts
+set LesHouchesReader:MomentumTreatment RescaleEnergy
+set LesHouchesReader:PDFA /Herwig/Partons/LHAPDF
+set LesHouchesReader:PDFB /Herwig/Partons/LHAPDF
+set LesHouchesReader:Weighted On
+insert LesHouchesHandler:LesHouchesReaders 0 LesHouchesReader
+
+##################################################
+# Shower parameters
+##################################################
+set /Herwig/Shower/ShowerHandler:MaxPtIsMuF Yes
+set /Herwig/Shower/ShowerHandler:RestrictPhasespace Yes
+set /Herwig/Shower/PartnerFinder:PartnerMethod Random
+set /Herwig/Shower/PartnerFinder:ScaleChoice Partner
+set /Herwig/Shower/KinematicsReconstructor:InitialInitialBoostOption LongTransBoost
+set /Herwig/Shower/KinematicsReconstructor:ReconstructionOption General
+set /Herwig/Shower/KinematicsReconstructor:InitialStateReconOption Rapidity
+set /Herwig/Shower/ShowerHandler:SpinCorrelations No
+
+##################################################
+# Rivet analysis
+##################################################
+cd /Herwig/Analysis
+create ThePEG::RivetAnalysis Rivet RivetAnalysis.so
+insert Rivet:Analyses 0 CMS_2026_PAS_SMP_25_010
+cd /Herwig/Generators
+insert EventGenerator:AnalysisHandlers 0 /Herwig/Analysis/Rivet
+
+##################################################
+# Save run
+##################################################
+cd /Herwig/Generators
+saverun zjets_hw EventGenerator

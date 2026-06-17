@@ -37,7 +37,7 @@ gunzip -kf "$LHE"; LHE=$(readlink -f "${LHE%.gz}")
 echo ">>> showering LHE with Herwig7: $LHE"
 
 # Herwig LHE reader + relocated-LCG fixes (same as the batch payload).
-cp "$PKG/herwig/lhe_shower.in" .; sed -i "s#@LHE@#$LHE#g" lhe_shower.in
+cp "$PKG/herwig/lhe_shower_nlo.in" lhe_shower.in; sed -i "s#@LHE@#$LHE#g" lhe_shower.in
 HWROOT=$(readlink -f "$(dirname "$(command -v Herwig)")/.." 2>/dev/null || true)
 READROOT=""
 if [ -f "$HWROOT/share/Herwig/snippets/PPCollider.in" ]; then READROOT="$HWROOT/share/Herwig"
