@@ -134,13 +134,14 @@ def build_mc(paths, title):
 
 def write_plot_files(outdir):
     """Write Rivet plot-config file with per-YODA-source styling via HISTOGRAM blocks.
-    The HISTOGRAM block ID syntax is: <yoda_filename>/<histogram_path>"""
+    HISTOGRAM block ID format: <yoda_filename>/<histogram_path>
+    See: https://gitlab.com/hepcedar/rivet/-/blob/master/doc/tutorials/customizeplots.md"""
     # MC process styles: colors and line styles
     mc_styles = {
         "pythia8":    {"color": "blue", "linestyle": "solid", "marker": "*"},
         "vincia":     {"color": "orange", "linestyle": "dashed", "marker": "o"},
         "amcnlo":     {"color": "green", "linestyle": "dotted", "marker": "triangle"},
-        "herwig":     {"color": "red", "linestyle": "dotdashed", "marker": "diamond"},
+        "herwig":     {"color": "red", "linestyle": "dashdotted", "marker": "diamond"},
         "mglo_pythia": {"color": "purple", "linestyle": "solid", "marker": "+"},
         "mglo_vincia": {"color": "brown", "linestyle": "dashed", "marker": "x"},
         "mglo_herwig": {"color": "pink", "linestyle": "dotted", "marker": "pentagon"},
@@ -154,15 +155,16 @@ def write_plot_files(outdir):
             blocks.append(f"""# BEGIN PLOT /{ANA}/{CHAN}_{groom}_pt{s}
 XMin=-4.5
 XMax=0.0
+LogY=0
 # END PLOT
 """)
 
-    # HISTOGRAM sections: per-YODA-source styling
+    # HISTOGRAM sections: per-YODA-source styling (uses regex for filename matching)
     for groom in GROOMS:
         for s in range(NSLICE):
             hist_path = f"/{ANA}/{CHAN}_{groom}_pt{s}"
             # Reference data
-            blocks.append(f"""# BEGIN HISTOGRAM ref.yoda{hist_path}
+            blocks.append(f"""# BEGIN HISTOGRAM .*ref\\.yoda{hist_path}
 LineColor=black
 LineWidth=2
 PolyMarker=square
@@ -171,7 +173,7 @@ ErrorBars=1
 """)
             # Each MC source
             for mc_name, style in mc_styles.items():
-                blocks.append(f"""# BEGIN HISTOGRAM mc_{mc_name}.yoda{hist_path}
+                blocks.append(f"""# BEGIN HISTOGRAM .*mc_{mc_name}\\.yoda{hist_path}
 LineColor={style['color']}
 LineStyle={style['linestyle']}
 PolyMarker={style['marker']}
