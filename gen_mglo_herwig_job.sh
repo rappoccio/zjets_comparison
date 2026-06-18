@@ -36,7 +36,7 @@ echo ">>> showering $NIN-event LO LHE with Herwig7: $LHE"
 
 # 2. Herwig setup (same fixes as gen_amcnlo_herwig_job.sh / gen_herwig_job.sh).
 cp "$PKG/herwig/lhe_shower.in" .
-sed -i -e "s#@LHE@#$LHE#g" -e "s/@NEV@/$NIN/g" lhe_shower.in
+sed -i "s#@LHE@#$LHE#g" lhe_shower.in
 
 HWROOT=$(readlink -f "$(dirname "$(command -v Herwig)")/.." 2>/dev/null || true)
 READROOT=""
@@ -62,8 +62,8 @@ ln -sf "$READROOT/snippets" snippets
 
 echo ">>> Herwig read (repo: $RPO ; include: ${INC:-cwd})"
 Herwig read --repo "$RPO" ${INC:+$INC "$READROOT"} lhe_shower.in
-echo ">>> Herwig run (seed $SEED)"
-Herwig run zjets_hw.run -s "$SEED" -d 0
+echo ">>> Herwig run (seed $SEED, $NIN events)"
+Herwig run zjets_hw.run -N "$NIN" -s "$SEED" -d 0
 
 YODA=$(ls -t *.yoda 2>/dev/null | head -1)
 [ -n "$YODA" ] || { echo "no YODA produced by Herwig" >&2; exit 1; }
