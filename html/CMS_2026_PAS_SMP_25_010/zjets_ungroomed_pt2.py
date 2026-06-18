@@ -2,7 +2,7 @@
 
 # This Python script was auto-generated using YODA v2.1.3.
 # Analysis object: /CMS_2026_PAS_SMP_25_010/zjets_ungroomed_pt2
-# Timestamp: 17-06-2026 (16:43:15)
+# Timestamp: 18-06-2026 (19:42:31)
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -31,7 +31,7 @@ yLims = (-0.00097384353, 0.96537826)
 
 # TeX-friendly labels for the legend
 labels = {
-  'legend' : ([ r"Data", r"mc\_amcnlo", r"mc\_herwig", r"mc\_mglo\_pythia", r"mc\_mglo\_vincia", r"mc\_pythia8", r"mc\_vincia" ], r""),
+  'legend' : ([ r"Data", r"mc\_amcnlo", r"mc\_herwig", r"mc\_mglo\_herwig", r"mc\_mglo\_pythia", r"mc\_mglo\_vincia", r"mc\_pythia8", r"mc\_vincia" ], r""),
 }
 
 # Adjust canvas width and height
@@ -148,7 +148,7 @@ styles = {
     'ratio0_xerrorbars' : 1,
     'ratio0_yerrorbars' : 1,
   },
-  'mc_mglo_pythia.yoda': {
+  'mc_mglo_herwig.yoda': {
     'color' : '#109618',
     'linestyle' : '-',
     'lineopacity' : 1.0,
@@ -175,7 +175,7 @@ styles = {
     'ratio0_xerrorbars' : 1,
     'ratio0_yerrorbars' : 1,
   },
-  'mc_mglo_vincia.yoda': {
+  'mc_mglo_pythia.yoda': {
     'color' : '#FF9900',
     'linestyle' : '-',
     'lineopacity' : 1.0,
@@ -202,7 +202,7 @@ styles = {
     'ratio0_xerrorbars' : 1,
     'ratio0_yerrorbars' : 1,
   },
-  'mc_pythia8.yoda': {
+  'mc_mglo_vincia.yoda': {
     'color' : '#990099',
     'linestyle' : '-',
     'lineopacity' : 1.0,
@@ -229,7 +229,7 @@ styles = {
     'ratio0_xerrorbars' : 1,
     'ratio0_yerrorbars' : 1,
   },
-  'mc_vincia.yoda': {
+  'mc_pythia8.yoda': {
     'color' : '#EE3311',
     'linestyle' : '-',
     'lineopacity' : 1.0,
@@ -251,6 +251,33 @@ styles = {
     'ratio0_markersize' : 2,
     'ratio0_capsize' : 0.0,
     'ratio0_zorder' : 11,
+    'ratio0_histstyle' : 1,
+    'ratio0_drawstyle' : 'steps-pre',
+    'ratio0_xerrorbars' : 1,
+    'ratio0_yerrorbars' : 1,
+  },
+  'mc_vincia.yoda': {
+    'color' : '#3366FF',
+    'linestyle' : '-',
+    'lineopacity' : 1.0,
+    'linewidth' : 1,
+    'marker' : 'none',
+    'markersize' : 2,
+    'capsize' : 0.0,
+    'zorder' : 12,
+    'histstyle' : 1,
+    'drawstyle' : 'steps-pre',
+    'xerrorbars' : 1,
+    'yerrorbars' : 1,
+    'fillcolor' : None,
+    'fillopacity' : 1.0,
+    'ratio0_linestyle' : '-',
+    'ratio0_lineopacity' : 1.0,
+    'ratio0_linewidth' : 1,
+    'ratio0_marker' : 'none',
+    'ratio0_markersize' : 2,
+    'ratio0_capsize' : 0.0,
+    'ratio0_zorder' : 12,
     'ratio0_histstyle' : 1,
     'ratio0_drawstyle' : 'steps-pre',
     'ratio0_xerrorbars' : 1,

@@ -133,12 +133,22 @@ def build_mc(paths, title):
 
 
 def write_plot_files(outdir):
-    """Write a single Rivet plot-config file controlling the x-axis range for
-    every histogram. rivet-mkhtml does NOT auto-discover .plot files sitting
-    next to the YODAs, so this file must be passed explicitly via `-c`
-    (see merge_plot.sh). Without it the plots default to the full data range
-    (-10..0) instead of the -4.5..0 region we care about."""
+    """Write Rivet plot-config file with per-YODA-source styling via HISTOGRAM blocks.
+    The HISTOGRAM block ID syntax is: <yoda_filename>/<histogram_path>"""
+    # MC process styles: colors and line styles
+    mc_styles = {
+        "pythia8":    {"color": "blue", "linestyle": "solid", "marker": "*"},
+        "vincia":     {"color": "orange", "linestyle": "dashed", "marker": "o"},
+        "amcnlo":     {"color": "green", "linestyle": "dotted", "marker": "triangle"},
+        "herwig":     {"color": "red", "linestyle": "dotdashed", "marker": "diamond"},
+        "mglo_pythia": {"color": "purple", "linestyle": "solid", "marker": "+"},
+        "mglo_vincia": {"color": "brown", "linestyle": "dashed", "marker": "x"},
+        "mglo_herwig": {"color": "pink", "linestyle": "dotted", "marker": "pentagon"},
+    }
+
     blocks = []
+
+    # PLOT sections: global axis configuration
     for groom in GROOMS:
         for s in range(NSLICE):
             blocks.append(f"""# BEGIN PLOT /{ANA}/{CHAN}_{groom}_pt{s}
@@ -146,10 +156,32 @@ XMin=-4.5
 XMax=0.0
 # END PLOT
 """)
+
+    # HISTOGRAM sections: per-YODA-source styling
+    for groom in GROOMS:
+        for s in range(NSLICE):
+            hist_path = f"/{ANA}/{CHAN}_{groom}_pt{s}"
+            # Reference data
+            blocks.append(f"""# BEGIN HISTOGRAM ref.yoda{hist_path}
+LineColor=black
+LineWidth=2
+PolyMarker=square
+ErrorBars=1
+# END HISTOGRAM
+""")
+            # Each MC source
+            for mc_name, style in mc_styles.items():
+                blocks.append(f"""# BEGIN HISTOGRAM mc_{mc_name}.yoda{hist_path}
+LineColor={style['color']}
+LineStyle={style['linestyle']}
+PolyMarker={style['marker']}
+# END HISTOGRAM
+""")
+
     plot_file = os.path.join(outdir, "axis.plot")
     with open(plot_file, "w") as f:
         f.write("\n".join(blocks))
-    print(f"wrote {plot_file} (pass to rivet-mkhtml with -c)")
+    print(f"wrote {plot_file} (with per-YODA-source styling)")
 
 
 def main():
